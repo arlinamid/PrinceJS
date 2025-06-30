@@ -1,12 +1,70 @@
-# IDEs
-.idea/
-.vscode/
-.DS_Store
-*.iml
-**/.project
-**/.settings
-*.code-workspace
-
-# package managers
-bower_components/
+# Dependencies
 node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Build outputs
+dist/
+build/
+.cache/
+
+# Vite
+.vite/
+vite.config.js.timestamp-*
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Logs
+logs
+*.log
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage directory used by tools like istanbul
+coverage/
+*.lcov
+
+# nyc test coverage
+.nyc_output
+
+# AI/ML model files (for future AI features)
+models/
+*.h5
+*.pb
+*.onnx
+
+# Temporary files
+tmp/
+temp/
+
+# Generated documentation
+docs/generated/
+
+# Dev server files
+dev-dist/

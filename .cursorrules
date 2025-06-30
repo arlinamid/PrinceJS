@@ -1,0 +1,37 @@
+This is my Prinse of Persia repo 
+I using windows enviroment
+I would like to create an enhanced version this old retro game
+At development always check dev server is running or not
+
+Allways check and UPDATE .md files for better documented the project
+
+Main goal is create an enhanced version this retro game
+
+{
+  "rules": [
+    {
+      "rule": "Always use modern JavaScript (ES6+) and modular patterns.",
+      "description": "This project is being upgraded. All new code should use modern JavaScript features like classes, modules, arrow functions, and const/let."
+    },
+    {
+      "rule": "Migrate from Phaser 2.6.2 to Phaser 3.9.",
+      "description": "The primary goal is to upgrade the Phaser version. Be aware of the breaking changes between Phaser 2 and 3. The entire API is different, so direct translation of code is not possible. Refer to the official Phaser 3 documentation and migration guides."
+    },
+    {
+      "rule": "Use Vite for the development server and build process.",
+      "description": "This project will use Vite for a fast development experience. Ensure that there is only one Vite dev server running at a time. All new code should be compatible with Vite's module-based approach."
+    },
+    {
+      "rule": "The development environment is Windows.",
+      "description": "Ensure all scripts and configurations are compatible with a Windows development environment. Use cross-platform scripts where possible."
+    },
+    {
+      "rule": "Follow a component-based architecture.",
+      "description": "For better organization and reusability, structure the game using a component-based approach. Each game entity should be composed of smaller, reusable components."
+    },
+    {
+      "rule": "Write TSDoc comments for all new functions and classes.",
+      "description": "To improve code clarity and maintainability, all new functions and classes should have TSDoc comments explaining their purpose, parameters, and return values."
+    }
+  ]
+}
