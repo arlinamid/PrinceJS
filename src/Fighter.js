@@ -7,8 +7,8 @@ PrinceJS.Fighter = function (game, level, location, direction, room, key, animKe
   this.charBlockX = location % 10;
   this.charBlockY = Math.floor(location / 10);
 
-  let x = PrinceJS.Utils.convertBlockXtoX(this.charBlockX);
-  let y = PrinceJS.Utils.convertBlockYtoY(this.charBlockY);
+  const x = PrinceJS.Utils.convertBlockXtoX(this.charBlockX);
+  const y = PrinceJS.Utils.convertBlockYtoY(this.charBlockY);
 
   PrinceJS.Actor.call(this, game, x, y, direction, key, animKey);
 
@@ -146,12 +146,12 @@ PrinceJS.Fighter.prototype.updateBase = function () {
 };
 
 PrinceJS.Fighter.prototype.updateSwordFrame = function () {
-  let framedef = this.anims.framedef[this.charFrame];
+  const framedef = this.anims.framedef[this.charFrame];
 
   this.charSword = typeof framedef.fsword !== "undefined";
 
   if (this.charSword) {
-    let stab = this.swordAnims.swordtab[framedef.fsword - 1];
+    const stab = this.swordAnims.swordtab[framedef.fsword - 1];
     this.swordFrame = stab.id;
     this.swordDx = stab.dx;
     this.swordDy = stab.dy;
@@ -159,10 +159,10 @@ PrinceJS.Fighter.prototype.updateSwordFrame = function () {
 };
 
 PrinceJS.Fighter.prototype.updateBlockXY = function () {
-  let footX = this.charX + this.charFdx * this.charFace - this.charFfoot * this.charFace;
-  let footY = this.charY + this.charFdy;
+  const footX = this.charX + this.charFdx * this.charFace - this.charFfoot * this.charFace;
+  const footY = this.charY + this.charFdy;
   this.charBlockX = PrinceJS.Utils.convertXtoBlockX(footX);
-  let charBlockYBefore = this.charBlockY;
+  const charBlockYBefore = this.charBlockY;
   this.charBlockY = Math.min(PrinceJS.Utils.convertYtoBlockY(footY), 2);
   this.updateFallingBlocks(this.charBlockY, charBlockYBefore);
 
@@ -174,7 +174,7 @@ PrinceJS.Fighter.prototype.updateBlockXY = function () {
       return;
     }
     if (this.level.rooms[this.room]) {
-      let leftRoom = this.level.rooms[this.room].links.left;
+      const leftRoom = this.level.rooms[this.room].links.left;
       if (leftRoom > 0) {
         this.charX += 140;
         this.baseX -= 320;
@@ -190,7 +190,7 @@ PrinceJS.Fighter.prototype.updateBlockXY = function () {
       return;
     }
     if (this.level.rooms[this.room]) {
-      let rightRoom = this.level.rooms[this.room].links.right;
+      const rightRoom = this.level.rooms[this.room].links.right;
       if (rightRoom > 0) {
         this.charX -= 140;
         this.baseX += 320;
@@ -258,7 +258,7 @@ PrinceJS.Fighter.prototype.checkFight = function () {
     return;
   }
 
-  let distance = this.opponentDistance();
+  const distance = this.opponentDistance();
   if (distance === -999) {
     return;
   }
@@ -291,8 +291,8 @@ PrinceJS.Fighter.prototype.checkFight = function () {
 
       if (!this.opponent.frameID(150) && !this.opponent.frameID(0)) {
         if (this.frameID(154) || this.frameID(4)) {
-          let minHurtDistance = this.opponent.swordDrawn ? 12 : 8;
-          let maxHurtDistance = 29 + (this.opponent.baseCharName === "fatguard" ? 2 : 0);
+          const minHurtDistance = this.opponent.swordDrawn ? 12 : 8;
+          const maxHurtDistance = 29 + (this.opponent.baseCharName === "fatguard" ? 2 : 0);
           if ((distance >= minHurtDistance || distance <= 0) && distance <= maxHurtDistance) {
             this.opponent.stabbed();
           }
@@ -348,9 +348,9 @@ PrinceJS.Fighter.prototype.opponentDistance = function () {
     return 999 * (this.canWalkOnNextTile() ? 1 : -1);
   }
 
-  let inSameRoom = this.opponentInSameRoom(this.opponent, this.room);
-  let inRoomLeft = this.opponentNearRoomLeft(this.opponent, this.room, true);
-  let inRoomRight = this.opponentNearRoomRight(this.opponent, this.room, true);
+  const inSameRoom = this.opponentInSameRoom(this.opponent, this.room);
+  const inRoomLeft = this.opponentNearRoomLeft(this.opponent, this.room, true);
+  const inRoomRight = this.opponentNearRoomRight(this.opponent, this.room, true);
   if (!(inSameRoom || inRoomLeft || inRoomRight)) {
     return 999;
   }
@@ -445,7 +445,7 @@ PrinceJS.Fighter.prototype.turnengarde = function () {
   if (!this.opponentOnSameLevel()) {
     return;
   }
-  let begin = this.charName === "kid" && this.action === "stand" && Math.abs(this.opponentDistance()) > 10;
+  const begin = this.charName === "kid" && this.action === "stand" && Math.abs(this.opponentDistance()) > 10;
   this.action = (begin ? "begin" : "") + "turnengarde";
   if (!this.swordDrawn && this.charName === "kid") {
     this.game.sound.play("UnsheatheSword");
@@ -572,8 +572,8 @@ PrinceJS.Fighter.prototype.bringAboveOpponent = function () {
   if (!this.opponent) {
     return;
   }
-  let group = this.game.world;
-  let opponentIndex = group.getIndex(this.opponent);
+  const group = this.game.world;
+  const opponentIndex = group.getIndex(this.opponent);
   if (opponentIndex >= 0 && group.getIndex(this) < opponentIndex) {
     group.remove(this, false, true);
     group.add(this, true, opponentIndex);
@@ -669,20 +669,20 @@ PrinceJS.Fighter.prototype.opponentNearRoomRight = function (opponent, room, ful
 };
 
 PrinceJS.Fighter.prototype.canSeeRoomRight = function (room) {
-  let rightRoom = this.level.rooms[room] && this.level.rooms[room].links.right;
+  const rightRoom = this.level.rooms[room] && this.level.rooms[room].links.right;
   if (rightRoom > 0) {
-    let tile = this.level.getTileAt(9, this.charBlockY, room);
-    let tileR = this.level.getTileAt(0, this.charBlockY, rightRoom);
+    const tile = this.level.getTileAt(9, this.charBlockY, room);
+    const tileR = this.level.getTileAt(0, this.charBlockY, rightRoom);
     return !tile.isSeeBarrier() && !tileR.isSeeBarrier();
   }
   return false;
 };
 
 PrinceJS.Fighter.prototype.canSeeRoomLeft = function (room) {
-  let leftRoom = this.level.rooms[room] && this.level.rooms[room].links.left;
+  const leftRoom = this.level.rooms[room] && this.level.rooms[room].links.left;
   if (leftRoom > 0) {
-    let tile = this.level.getTileAt(0, this.charBlockY, room);
-    let tileL = this.level.getTileAt(9, this.charBlockY, leftRoom);
+    const tile = this.level.getTileAt(0, this.charBlockY, room);
+    const tileL = this.level.getTileAt(9, this.charBlockY, leftRoom);
     return !tile.isSeeBarrier() && !tileL.isSeeBarrier();
   }
   return false;
@@ -720,8 +720,8 @@ PrinceJS.Fighter.prototype.nearBarrier = function (charBlockX, charBlockY, walk 
   charBlockX = charBlockX || this.charBlockX;
   charBlockY = charBlockY || this.charBlockY;
 
-  let tile = this.level.getTileAt(charBlockX, charBlockY, this.room);
-  let tileF = this.level.getTileAt(charBlockX + this.charFace, charBlockY, this.room);
+  const tile = this.level.getTileAt(charBlockX, charBlockY, this.room);
+  const tileF = this.level.getTileAt(charBlockX + this.charFace, charBlockY, this.room);
 
   return (
     tileF.element === PrinceJS.Level.TILE_WALL ||
@@ -733,7 +733,7 @@ PrinceJS.Fighter.prototype.nearBarrier = function (charBlockX, charBlockY, walk 
 };
 
 PrinceJS.Fighter.prototype.canCrossGate = function (tile, walk = false, turn = false) {
-  let tileF = this.level.getTileAt(tile.roomX + this.charFace, tile.roomY, this.room);
+  const tileF = this.level.getTileAt(tile.roomX + this.charFace, tile.roomY, this.room);
   if (!tileF) {
     return false;
   }
@@ -750,13 +750,13 @@ PrinceJS.Fighter.prototype.canCrossGate = function (tile, walk = false, turn = f
 };
 
 PrinceJS.Fighter.prototype.standsOnTile = function (tile) {
-  let floorTile = this.level.getTileAt(tile.roomX, tile.roomY, tile.room);
-  let fighterTile = this.level.getTileAt(this.charBlockX, this.charBlockY, this.room);
+  const floorTile = this.level.getTileAt(tile.roomX, tile.roomY, tile.room);
+  const fighterTile = this.level.getTileAt(this.charBlockX, this.charBlockY, this.room);
   return floorTile === fighterTile;
 };
 
 PrinceJS.Fighter.prototype.canWalkOnTile = function (charBlockX, charBlockY, room, turn = false) {
-  let tile = this.level.getTileAt(charBlockX, charBlockY, room);
+  const tile = this.level.getTileAt(charBlockX, charBlockY, room);
   if (!this.canCrossGate(tile, true, turn)) {
     return false;
   }
@@ -770,13 +770,13 @@ PrinceJS.Fighter.prototype.canWalkOnTile = function (charBlockX, charBlockY, roo
 };
 
 PrinceJS.Fighter.prototype.canWalkOnNextTile = function () {
-  let charBlockX = PrinceJS.Utils.convertXtoBlockX(this.charX + this.charFdx * this.charFace);
-  let tileF = this.level.getTileAt(charBlockX + this.charFace, this.charBlockY, this.room);
+  const charBlockX = PrinceJS.Utils.convertXtoBlockX(this.charX + this.charFdx * this.charFace);
+  const tileF = this.level.getTileAt(charBlockX + this.charFace, this.charBlockY, this.room);
   if (tileF.isSafeWalkable()) {
     return true;
   }
   if (this.charBlockY < 2) {
-    let tileBF = this.level.getTileAt(charBlockX + this.charFace, this.charBlockY + 1, this.room);
+    const tileBF = this.level.getTileAt(charBlockX + this.charFace, this.charBlockY + 1, this.room);
     if (tileBF.isSafeWalkable()) {
       return true;
     }
@@ -789,15 +789,15 @@ PrinceJS.Fighter.prototype.canReachOpponent = function (below = false, turn = fa
     return false;
   }
 
-  let hasNoBarrier = this.checkPathToOpponent(
+  const hasNoBarrier = this.checkPathToOpponent(
     this.centerX,
     this.opponent,
     this.charBlockX,
     this.charBlockY,
     this.room,
     (charBlockX, charBlockY, room) => {
-      let tile = this.level.getTileAt(charBlockX, charBlockY, room);
-      let tileF = this.level.getTileAt(tile.roomX + this.charFace * (turn ? -1 : 1), tile.roomY, this.room);
+      const tile = this.level.getTileAt(charBlockX, charBlockY, room);
+      const tileF = this.level.getTileAt(tile.roomX + this.charFace * (turn ? -1 : 1), tile.roomY, this.room);
       return {
         value: this.canCrossGate(tile, true, turn) && !(tile.isBarrierWalk() || tileF.isBarrierWalk())
       };
@@ -820,7 +820,7 @@ PrinceJS.Fighter.prototype.canReachOpponent = function (below = false, turn = fa
           value: true
         };
       }
-      let tile = this.level.getTileAt(charBlockX, charBlockY, room);
+      const tile = this.level.getTileAt(charBlockX, charBlockY, room);
       if (below && tile.isSpace() && charBlockY < 2 && this.opponent.charBlockY === charBlockY + 1) {
         return {
           value: this.checkPathToOpponent(
@@ -945,7 +945,7 @@ PrinceJS.Fighter.prototype.setSneakUp = function (state) {
 
 PrinceJS.Fighter.prototype.checkButton = function () {
   if (this.charFcheck) {
-    let tile = this.level.getTileAt(this.charBlockX, this.charBlockY, this.room);
+    const tile = this.level.getTileAt(this.charBlockX, this.charBlockY, this.room);
     switch (tile.element) {
       case PrinceJS.Level.TILE_RAISE_BUTTON:
       case PrinceJS.Level.TILE_DROP_BUTTON:
@@ -960,8 +960,8 @@ PrinceJS.Fighter.prototype.checkFloor = function () {
     return;
   }
   let tile = this.level.getTileAt(this.charBlockX, this.charBlockY, this.room);
-  let tileF = this.level.getTileAt(this.charBlockX + this.charFace, this.charBlockY, this.room);
-  let tileR = this.level.getTileAt(this.charBlockX - this.charFace, this.charBlockY, this.room);
+  const tileF = this.level.getTileAt(this.charBlockX + this.charFace, this.charBlockY, this.room);
+  const tileR = this.level.getTileAt(this.charBlockX - this.charFace, this.charBlockY, this.room);
 
   let checkCharFcheck = this.charFcheck;
   if (["advance", "retreat"].includes(this.action)) {
@@ -1012,7 +1012,7 @@ PrinceJS.Fighter.prototype.checkFloor = function () {
 };
 
 PrinceJS.Fighter.prototype.checkFall = function (tile) {
-  let charBlockY = this.charBlockY;
+  const charBlockY = this.charBlockY;
   if (this.charY + 6 >= PrinceJS.Utils.convertBlockYtoY(charBlockY)) {
     tile = this.level.getTileAt(this.charBlockX, charBlockY, this.room);
     if (tile.isWalkable()) {
@@ -1045,7 +1045,7 @@ PrinceJS.Fighter.prototype.startFall = function () {
   this.fallingBlocks = 0;
   this.inFallDown = true;
 
-  let act = "stepfall";
+  const act = "stepfall";
   if (["retreat"].includes(this.action) || this.swordDrawn) {
     this.charX += 10 * this.charFace * (this.action === "advance" ? 1 : -1);
     this.level.maskTile(this.charBlockX + this.charFace, this.charBlockY, this.room, this);
@@ -1074,7 +1074,7 @@ PrinceJS.Fighter.prototype.land = function () {
   }
   this.stopFall();
 
-  let tile = this.level.getTileAt(this.charBlockX, this.charBlockY, this.room);
+  const tile = this.level.getTileAt(this.charBlockX, this.charBlockY, this.room);
   if (tile.element === PrinceJS.Level.TILE_SPIKES) {
     this.game.sound.play("SpikedBySpikes"); // HardLandingSplat
     this.alignToTile(tile);
@@ -1130,7 +1130,7 @@ PrinceJS.Fighter.prototype.inSpikeDistance = function (tile) {
 
 PrinceJS.Fighter.prototype.trySpikes = function (x, y) {
   while (y < 3) {
-    let tile = this.level.getTileAt(x, y, this.room);
+    const tile = this.level.getTileAt(x, y, this.room);
     if (tile.element === PrinceJS.Level.TILE_SPIKES) {
       tile.raise();
     }
@@ -1145,13 +1145,13 @@ PrinceJS.Fighter.prototype.checkChoppers = function () {
   if (this.charName === "kid") {
     this.level.activateChopper(-1, this.charBlockY, this.room);
     if (this.level.rooms[this.room]) {
-      let rightRoom = this.level.rooms[this.room].links.right;
+      const rightRoom = this.level.rooms[this.room].links.right;
       if (this.charBlockX === 9 && this.charX > 130 && rightRoom > 0) {
         this.level.activateChopper(-1, this.charBlockY, rightRoom);
       }
     }
     if (this.level.rooms[this.room]) {
-      let leftRoom = this.level.rooms[this.room].links.left;
+      const leftRoom = this.level.rooms[this.room].links.left;
       if (this.charBlockX === 0 && this.charX < 5 && leftRoom > 0) {
         this.level.activateChopper(-1, this.charBlockY, leftRoom);
       }
@@ -1161,7 +1161,7 @@ PrinceJS.Fighter.prototype.checkChoppers = function () {
 };
 
 PrinceJS.Fighter.prototype.chopDistance = function (tile) {
-  let offsetX = -16;
+  const offsetX = -16;
   return tile.centerX - this.centerX + offsetX;
 };
 
@@ -1226,7 +1226,7 @@ PrinceJS.Fighter.prototype.chopperDistance = function (x, y) {
 };
 
 PrinceJS.Fighter.prototype.dodgeChoppers = function () {
-  let chopperDistance = this.chopperDistance(this.charBlockX, this.charBlockY);
+  const chopperDistance = this.chopperDistance(this.charBlockX, this.charBlockY);
   if (chopperDistance >= 13 && chopperDistance <= 16) {
     this.charX -= 16 - chopperDistance;
   } else if (chopperDistance >= -16 && chopperDistance <= -13) {
@@ -1240,6 +1240,11 @@ PrinceJS.Fighter.prototype.dieSpikes = function () {
     return;
   }
 
+  // Check for GOD mode cheat for Kid
+  if (this.charName === "kid" && PrinceJS.cheats && PrinceJS.cheats.godMode) {
+    return; // Prevent spike death
+  }
+
   this.die();
   this.action = "impale";
 };
@@ -1247,6 +1252,11 @@ PrinceJS.Fighter.prototype.dieSpikes = function () {
 PrinceJS.Fighter.prototype.dieChopper = function () {
   if (!this.alive || this.charName === "skeleton") {
     return;
+  }
+
+  // Check for GOD mode cheat for Kid
+  if (this.charName === "kid" && PrinceJS.cheats && PrinceJS.cheats.godMode) {
+    return; // Prevent chopper death
   }
 
   this.die();
@@ -1285,7 +1295,7 @@ PrinceJS.Fighter.prototype.die = function (action) {
     return;
   }
 
-  let damage = this.health;
+  const damage = this.health;
   this.health -= damage;
   this.onDamageLife.dispatch(damage);
 
@@ -1352,11 +1362,11 @@ PrinceJS.Fighter.prototype.sneaks = function () {
 };
 
 PrinceJS.Fighter.prototype.getCharBounds = function () {
-  let f = this.game.cache.getFrameData(this.charName).getFrameByName(this.charName + "-" + this.charFrame);
+  const f = this.game.cache.getFrameData(this.charName).getFrameByName(this.charName + "-" + this.charFrame);
   let x = PrinceJS.Utils.convertX(this.charX + this.charFdx * this.charFace);
-  let y = this.charY + this.charFdy - f.height;
+  const y = this.charY + this.charFdy - f.height;
   let w = f.width;
-  let h = f.height;
+  const h = f.height;
   if (this.faceR()) {
     x -= f.width - 5;
   }
@@ -1386,7 +1396,7 @@ PrinceJS.Fighter.prototype.alignToTile = function (tile) {
 };
 
 PrinceJS.Fighter.prototype.alignToFloor = function () {
-  let tile = this.level.getTileAt(this.charBlockX, this.charBlockY, this.room);
+  const tile = this.level.getTileAt(this.charBlockX, this.charBlockY, this.room);
   if (tile.roomY >= 0) {
     this.charY = PrinceJS.Utils.convertBlockYtoY(tile.roomY);
   }

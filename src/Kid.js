@@ -95,11 +95,11 @@ PrinceJS.Kid.prototype.CMD_TAP = function (data) {
 
 PrinceJS.Kid.prototype.CMD_JARU = function (data) {
   this.level.shakeFloor(this.charBlockY - 1, this.room);
-  let tile = this.level.getTileAt(this.charBlockX, this.charBlockY - 1, this.room);
+  const tile = this.level.getTileAt(this.charBlockX, this.charBlockY - 1, this.room);
   if (tile.element === PrinceJS.Level.TILE_LOOSE_BOARD) {
     tile.shake(true);
   }
-  let tileR = this.level.getTileAt(this.charBlockX + 1, this.charBlockY - 1, this.room);
+  const tileR = this.level.getTileAt(this.charBlockX + 1, this.charBlockY - 1, this.room);
   if (tileR.element === PrinceJS.Level.TILE_LOOSE_BOARD) {
     tileR.shake(true);
   }
@@ -119,7 +119,7 @@ PrinceJS.Kid.prototype.CMD_NEXTLEVEL = function (data) {
     this.game.sound.play("Prince");
     waitTime = 13000;
   }
-  let currentLevel = PrinceJS.currentLevel;
+  const currentLevel = PrinceJS.currentLevel;
   this.onLevelFinished.dispatch(currentLevel);
   PrinceJS.Utils.delayed(() => {
     this.onNextLevel.dispatch(currentLevel);
@@ -176,7 +176,7 @@ PrinceJS.Kid.prototype.drinkPotion = function () {
   }
   this.game.sound.play("DrinkPotionGlugGlug");
   this.action = "drinkpotion";
-  let potionType = tile.modifier;
+  const potionType = tile.modifier;
   this.level.removeObject(tile.roomX, tile.roomY, tile.room);
   if (tile.isSpecial) {
     return;
@@ -427,6 +427,13 @@ PrinceJS.Kid.prototype.updateBehaviour = function () {
       if (this.keyS()) {
         return this.tryGrabEdge();
       }
+      // Auto-grab for platforms when falling (if not holding up to prevent grabbing)
+      if (!this.keyU() && ["jumpfall", "rjumpfall"].includes(this.action)) {
+        const result = this.tryGrabEdge();
+        if (result) {
+          return result;
+        }
+      }
       break;
 
     case "engarde":
@@ -497,7 +504,7 @@ PrinceJS.Kid.prototype.tryEngarde = function () {
   this.dodgeChoppers();
 
   this.level.recheckCurrentRoom();
-  let engardeDistance = !this.opponent.facingOpponent() && this.opponent.sneakUp ? 35 : 100;
+  const engardeDistance = !this.opponent.facingOpponent() && this.opponent.sneakUp ? 35 : 100;
   if (this.opponent && this.opponent.alive && this.opponentDistance() <= engardeDistance) {
     return this.engarde();
   }
@@ -515,7 +522,7 @@ PrinceJS.Kid.prototype.inFallDistance = function (tile) {
   if (this.x === 0 || !["runstop", "runturn", "runjump", "standjump"].includes(this.action)) {
     return true;
   }
-  let offsetX = this.faceL() ? 10 : -14;
+  const offsetX = this.faceL() ? 10 : -14;
   return Math.abs(tile.centerX - this.centerX + offsetX) >= 25;
 };
 
@@ -526,7 +533,7 @@ PrinceJS.Kid.prototype.checkLooseFloor = function (tile) {
 };
 
 PrinceJS.Kid.prototype.inGrabDistance = function (tile, distance = 30) {
-  let offsetX = this.faceL() ? 2 : -5;
+  const offsetX = this.faceL() ? 2 : -5;
   return Math.abs(tile.centerX - this.centerX + offsetX) <= distance;
 };
 
@@ -535,11 +542,11 @@ PrinceJS.Kid.prototype.tryGrabEdge = function () {
   if (this.fallingBlocks > 2 && !this.inFloat) {
     return;
   }
-  let tileT = this.level.getTileAt(this.charBlockX, this.charBlockY - 1, this.room);
-  let tileTF = this.level.getTileAt(this.charBlockX + this.charFace, this.charBlockY - 1, this.room);
-  let tileTR = this.level.getTileAt(this.charBlockX - this.charFace, this.charBlockY - 1, this.room);
+  const tileT = this.level.getTileAt(this.charBlockX, this.charBlockY - 1, this.room);
+  const tileTF = this.level.getTileAt(this.charBlockX + this.charFace, this.charBlockY - 1, this.room);
+  const tileTR = this.level.getTileAt(this.charBlockX - this.charFace, this.charBlockY - 1, this.room);
 
-  let isInDistance =
+  const isInDistance =
     this.distanceToEdge() <= 10 + (["stepfall"].includes(this.action) ? 3 : 0) &&
     (this.distanceToTopFloor() >= -50 ||
       (["jumpfall", "freefall"].includes(this.action) && this.distanceToFloor() > -3));
@@ -586,7 +593,7 @@ PrinceJS.Kid.prototype.grab = function (x) {
   this.game.sound.play("BumpIntoWallHard");
   this.processCommand();
 
-  let tile = this.level.getTileAt(this.charBlockX, this.charBlockY - 1, this.room);
+  const tile = this.level.getTileAt(this.charBlockX, this.charBlockY - 1, this.room);
   if (tile.element === PrinceJS.Level.TILE_LOOSE_BOARD) {
     tile.shake(true);
   }
@@ -624,9 +631,9 @@ PrinceJS.Kid.prototype.checkBarrier = function () {
     return;
   }
 
-  let tile = this.level.getTileAt(this.charBlockX, this.charBlockY, this.room);
-  let tileT = this.level.getTileAt(this.charBlockX, this.charBlockY - 1, this.room);
-  let tileR = this.level.getTileAt(this.charBlockX - this.charFace, this.charBlockY, this.room);
+  const tile = this.level.getTileAt(this.charBlockX, this.charBlockY, this.room);
+  const tileT = this.level.getTileAt(this.charBlockX, this.charBlockY - 1, this.room);
+  const tileR = this.level.getTileAt(this.charBlockX - this.charFace, this.charBlockY, this.room);
 
   if (this.action === "freefall" && tile.isFreeFallBarrier() && tileT.isFreeFallBarrier()) {
     if (this.moveL()) {
@@ -661,8 +668,8 @@ PrinceJS.Kid.prototype.checkBarrier = function () {
       this.bump();
     }
   } else {
-    let offsetX = this.swordDrawn ? 12 * this.charFace : 0;
-    let blockX = PrinceJS.Utils.convertXtoBlockX(this.charX + this.charFdx * this.charFace - offsetX);
+    const offsetX = this.swordDrawn ? 12 * this.charFace : 0;
+    const blockX = PrinceJS.Utils.convertXtoBlockX(this.charX + this.charFdx * this.charFace - offsetX);
     let tileNext = this.level.getTileAt(blockX, this.charBlockY, this.room);
 
     if (tileNext.isBarrier()) {
@@ -727,7 +734,7 @@ PrinceJS.Kid.prototype.bump = function () {
     this.charX -= 2 * this.charFace * this.backwardsFall;
     this.bumpFall();
   } else {
-    let y = this.distanceToFloor();
+    const y = this.distanceToFloor();
     if (y >= 5) {
       this.bumpFall();
     } else {
@@ -819,7 +826,7 @@ PrinceJS.Kid.prototype.block = function () {
 };
 
 PrinceJS.Kid.prototype.prepareCheckFloor = function () {
-  let checkCharBlockX = this.charBlockX;
+  const checkCharBlockX = this.charBlockX;
   let checkCharBlockY = this.charBlockY;
   let checkCharFcheck = this.charFcheck;
 
@@ -846,7 +853,7 @@ PrinceJS.Kid.prototype.prepareCheckFloor = function () {
 };
 
 PrinceJS.Kid.prototype.checkButton = function () {
-  let { skip, tile, checkCharFcheck } = this.prepareCheckFloor();
+  const { skip, tile, checkCharFcheck } = this.prepareCheckFloor();
   if (skip) {
     return;
   }
@@ -872,11 +879,11 @@ PrinceJS.Kid.prototype.checkButton = function () {
 };
 
 PrinceJS.Kid.prototype.checkFloor = function () {
-  let { skip, tile, checkCharFcheck } = this.prepareCheckFloor();
+  const { skip, tile, checkCharFcheck } = this.prepareCheckFloor();
   if (skip) {
     return;
   }
-  let tileR = this.level.getTileAt(tile.roomX - this.charFace, tile.roomY, this.room);
+  const tileR = this.level.getTileAt(tile.roomX - this.charFace, tile.roomY, this.room);
   if (["climbup", "climbdown"].includes(this.action) && ![PrinceJS.Level.TILE_LOOSE_BOARD].includes(tile.element)) {
     return;
   }
@@ -971,8 +978,8 @@ PrinceJS.Kid.prototype.checkRoomChange = function () {
   ) {
     return;
   }
-  let footX = this.charX + this.charFdx * this.charFace;
-  let footBlockX = PrinceJS.Utils.convertXtoBlockX(footX);
+  const footX = this.charX + this.charFdx * this.charFace;
+  const footBlockX = PrinceJS.Utils.convertXtoBlockX(footX);
 
   if (footBlockX >= 9 && (this.moveR(false) || ["bump"].includes(this.action))) {
     let cameraRoom = this.room;
@@ -1071,8 +1078,8 @@ PrinceJS.Kid.prototype.maskAndCrop = function () {
 };
 
 PrinceJS.Kid.prototype.tryPickup = function () {
-  let tile = this.level.getTileAt(this.charBlockX, this.charBlockY, this.room);
-  let tileF = this.level.getTileAt(this.charBlockX + this.charFace, this.charBlockY, this.room);
+  const tile = this.level.getTileAt(this.charBlockX, this.charBlockY, this.room);
+  const tileF = this.level.getTileAt(this.charBlockX + this.charFace, this.charBlockY, this.room);
 
   this.pickupSword = tile.element === PrinceJS.Level.TILE_SWORD || tileF.element === PrinceJS.Level.TILE_SWORD;
   this.pickupPotion = tile.element === PrinceJS.Level.TILE_POTION || tileF.element === PrinceJS.Level.TILE_POTION;
@@ -1096,22 +1103,42 @@ PrinceJS.Kid.prototype.tryPickup = function () {
 };
 
 PrinceJS.Kid.prototype.keyL = function () {
+  // Block input if cheat menu is open
+  if (PrinceJS.Utils.CheatMenu.isOpen) {
+    return false;
+  }
   return this.cursors.left.isDown || this.pointerL() || PrinceJS.Utils.gamepadLeftPressed(this.game);
 };
 
 PrinceJS.Kid.prototype.keyR = function () {
+  // Block input if cheat menu is open
+  if (PrinceJS.Utils.CheatMenu.isOpen) {
+    return false;
+  }
   return this.cursors.right.isDown || this.pointerR() || PrinceJS.Utils.gamepadRightPressed(this.game);
 };
 
 PrinceJS.Kid.prototype.keyU = function () {
+  // Block input if cheat menu is open
+  if (PrinceJS.Utils.CheatMenu.isOpen) {
+    return false;
+  }
   return this.cursors.up.isDown || this.pointerU() || PrinceJS.Utils.gamepadUpPressed(this.game);
 };
 
 PrinceJS.Kid.prototype.keyD = function () {
+  // Block input if cheat menu is open
+  if (PrinceJS.Utils.CheatMenu.isOpen) {
+    return false;
+  }
   return this.cursors.down.isDown || this.pointerD() || PrinceJS.Utils.gamepadDownPressed(this.game);
 };
 
 PrinceJS.Kid.prototype.keyS = function () {
+  // Block input if cheat menu is open
+  if (PrinceJS.Utils.CheatMenu.isOpen) {
+    return false;
+  }
   return this.shiftKey.isDown || this.pointerS() || PrinceJS.Utils.gamepadActionPressed(this.game);
 };
 
@@ -1119,8 +1146,8 @@ PrinceJS.Kid.prototype.pointerL = function () {
   if (!PrinceJS.Utils.pointerDown(this.game)) {
     return;
   }
-  let pos = PrinceJS.Utils.effectivePointer(this.game);
-  let size = PrinceJS.Utils.effectiveScreenSize(this.game);
+  const pos = PrinceJS.Utils.effectivePointer(this.game);
+  const size = PrinceJS.Utils.effectiveScreenSize(this.game);
   return (
     pos.x >= 0 &&
     pos.x <= (1 / 3) * size.width &&
@@ -1133,8 +1160,8 @@ PrinceJS.Kid.prototype.pointerR = function () {
   if (!PrinceJS.Utils.pointerDown(this.game)) {
     return;
   }
-  let pos = PrinceJS.Utils.effectivePointer(this.game);
-  let size = PrinceJS.Utils.effectiveScreenSize(this.game);
+  const pos = PrinceJS.Utils.effectivePointer(this.game);
+  const size = PrinceJS.Utils.effectiveScreenSize(this.game);
   return (
     pos.x >= (2 / 3) * size.width &&
     pos.x <= size.width &&
@@ -1147,8 +1174,8 @@ PrinceJS.Kid.prototype.pointerU = function () {
   if (!PrinceJS.Utils.pointerDown(this.game)) {
     return;
   }
-  let pos = PrinceJS.Utils.effectivePointer(this.game);
-  let size = PrinceJS.Utils.effectiveScreenSize(this.game);
+  const pos = PrinceJS.Utils.effectivePointer(this.game);
+  const size = PrinceJS.Utils.effectiveScreenSize(this.game);
   return (
     pos.x >= 0 &&
     pos.x <= size.width &&
@@ -1161,8 +1188,8 @@ PrinceJS.Kid.prototype.pointerD = function () {
   if (!PrinceJS.Utils.pointerDown(this.game)) {
     return;
   }
-  let pos = PrinceJS.Utils.effectivePointer(this.game);
-  let size = PrinceJS.Utils.effectiveScreenSize(this.game);
+  const pos = PrinceJS.Utils.effectivePointer(this.game);
+  const size = PrinceJS.Utils.effectiveScreenSize(this.game);
   return (
     pos.x >= 0 &&
     pos.x <= size.width &&
@@ -1175,9 +1202,9 @@ PrinceJS.Kid.prototype.pointerS = function () {
   if (!PrinceJS.Utils.pointerDown(this.game)) {
     return;
   }
-  let pos = PrinceJS.Utils.effectivePointer(this.game);
-  let size = PrinceJS.Utils.effectiveScreenSize(this.game);
-  let bias = this.swordDrawn ? 0.5 : 0;
+  const pos = PrinceJS.Utils.effectivePointer(this.game);
+  const size = PrinceJS.Utils.effectiveScreenSize(this.game);
+  const bias = this.swordDrawn ? 0.5 : 0;
   return (
     pos.x >= ((0.5 + bias) * size.width) / 3 &&
     pos.x <= ((2.5 - bias) * size.width) / 3 &&
@@ -1199,7 +1226,7 @@ PrinceJS.Kid.prototype.syncShadow = function () {
 };
 
 PrinceJS.Kid.prototype.mergeShadowPosition = function () {
-  let shadow = this.opponent;
+  const shadow = this.opponent;
   this.opponent = null;
   shadow.opponent = null;
   shadow.action = "stand";
@@ -1282,10 +1309,10 @@ PrinceJS.Kid.prototype.land = function () {
   this.charYVel = 0;
   this.ledgeSwing = 0;
 
-  let fallingBlocks = this.inFloat ? 0 : this.fallingBlocks;
+  const fallingBlocks = this.inFloat ? 0 : this.fallingBlocks;
   this.stopFall();
 
-  let tile = this.level.getTileAt(this.charBlockX, this.charBlockY, this.room);
+  const tile = this.level.getTileAt(this.charBlockX, this.charBlockY, this.room);
   if (tile.element === PrinceJS.Level.TILE_SPIKES) {
     this.game.sound.play("SpikedBySpikes"); // HardLandingSplat
     this.alignToTile(tile);
@@ -1333,8 +1360,8 @@ PrinceJS.Kid.prototype.runstop = function () {
 PrinceJS.Kid.prototype.step = function () {
   let px = 11;
 
-  let tile = this.level.getTileAt(this.charBlockX, this.charBlockY, this.room);
-  let tileF = this.level.getTileAt(this.charBlockX + this.charFace, this.charBlockY, this.room);
+  const tile = this.level.getTileAt(this.charBlockX, this.charBlockY, this.room);
+  const tileF = this.level.getTileAt(this.charBlockX + this.charFace, this.charBlockY, this.room);
 
   if (
     (tile.element === PrinceJS.Level.TILE_CHOPPER && this.faceL()) ||
@@ -1472,8 +1499,8 @@ PrinceJS.Kid.prototype.startFall = function () {
       this.charX -= 7 * this.charFace;
     }
 
-    let tile = this.level.getTileAt(this.charBlockX, this.charBlockY, this.room);
-    let dx = tile.isWalkable() ? 10 : 5;
+    const tile = this.level.getTileAt(this.charBlockX, this.charBlockY, this.room);
+    const dx = tile.isWalkable() ? 10 : 5;
     if (["retreat"].includes(this.action) || this.swordDrawn) {
       this.charX += dx * this.charFace * (this.action === "advance" ? 1 : -1);
       this.level.maskTile(this.charBlockX + this.charFace, this.charBlockY, this.room, this);
@@ -1487,7 +1514,7 @@ PrinceJS.Kid.prototype.startFall = function () {
 };
 
 PrinceJS.Kid.prototype.stoop = function () {
-  let tileR = this.level.getTileAt(this.charBlockX - this.charFace, this.charBlockY, this.room);
+  const tileR = this.level.getTileAt(this.charBlockX - this.charFace, this.charBlockY, this.room);
 
   if (
     [PrinceJS.Level.TILE_SPACE, PrinceJS.Level.TILE_TOP_BIG_PILLAR].includes(tileR.element) ||
@@ -1510,7 +1537,7 @@ PrinceJS.Kid.prototype.stoop = function () {
 PrinceJS.Kid.prototype.climbdown = function () {
   this.blockEngarde = false;
 
-  let tile = this.level.getTileAt(this.charBlockX, this.charBlockY, this.room);
+  const tile = this.level.getTileAt(this.charBlockX, this.charBlockY, this.room);
 
   if (
     this.faceL() &&
@@ -1531,7 +1558,7 @@ PrinceJS.Kid.prototype.climbdown = function () {
 PrinceJS.Kid.prototype.climbup = function () {
   this.blockEngarde = false;
 
-  let tileT = this.level.getTileAt(this.charBlockX, this.charBlockY - 1, this.room);
+  const tileT = this.level.getTileAt(this.charBlockX, this.charBlockY - 1, this.room);
 
   if (
     this.faceL() &&
@@ -1557,7 +1584,7 @@ PrinceJS.Kid.prototype.jumpup = function () {
 };
 
 PrinceJS.Kid.prototype.highjump = function () {
-  let tileTR = this.level.getTileAt(this.charBlockX - this.charFace, this.charBlockY - 1, this.room);
+  const tileTR = this.level.getTileAt(this.charBlockX - this.charFace, this.charBlockY - 1, this.room);
 
   this.action = "highjump";
   if (this.faceL() && tileTR.isWalkable()) {
@@ -1610,10 +1637,10 @@ PrinceJS.Kid.prototype.climbstairs = function () {
 
 PrinceJS.Kid.prototype.jump = function () {
   let tile = this.level.getTileAt(this.charBlockX, this.charBlockY, this.room);
-  let tileT = this.level.getTileAt(this.charBlockX, this.charBlockY - 1, this.room);
-  let tileTF = this.level.getTileAt(this.charBlockX + this.charFace, this.charBlockY - 1, this.room);
-  let tileTR = this.level.getTileAt(this.charBlockX - this.charFace, this.charBlockY - 1, this.room);
-  let tileR = this.level.getTileAt(this.charBlockX - this.charFace, this.charBlockY, this.room);
+  const tileT = this.level.getTileAt(this.charBlockX, this.charBlockY - 1, this.room);
+  const tileTF = this.level.getTileAt(this.charBlockX + this.charFace, this.charBlockY - 1, this.room);
+  const tileTR = this.level.getTileAt(this.charBlockX - this.charFace, this.charBlockY - 1, this.room);
+  const tileR = this.level.getTileAt(this.charBlockX - this.charFace, this.charBlockY, this.room);
 
   if (tile.isExitDoor()) {
     if (tile.element === PrinceJS.Level.TILE_EXIT_LEFT) {
@@ -1677,6 +1704,12 @@ PrinceJS.Kid.prototype.damageLife = function (crouch = false) {
   if (!this.alive) {
     return;
   }
+  
+  // Check for GOD mode cheat
+  if (PrinceJS.cheats && PrinceJS.cheats.godMode) {
+    return; // Prevent all damage
+  }
+  
   this.showSplash();
   PrinceJS.Utils.flashRedDamage(this.game);
   if (crouch) {
@@ -1691,8 +1724,13 @@ PrinceJS.Kid.prototype.damageLife = function (crouch = false) {
 };
 
 PrinceJS.Kid.prototype.stealLife = function () {
+  // Check for GOD mode cheat
+  if (PrinceJS.cheats && PrinceJS.cheats.godMode) {
+    return; // Prevent life stealing
+  }
+  
   if (this.health > 1) {
-    let damage = this.health - 1;
+    const damage = this.health - 1;
     this.health = 1;
     this.onDamageLife.dispatch(damage);
   }
@@ -1725,7 +1763,7 @@ PrinceJS.Kid.prototype.floatFall = function () {
   }
   this.inFloat = true;
   this.game.sound.play("Float");
-  let handle = PrinceJS.Utils.delayedCancelable(() => {
+  const handle = PrinceJS.Utils.delayedCancelable(() => {
     this.inFloat = false;
     this.inFloatTimeoutCancel = null;
     this.fallingBlocks = 0;
@@ -1746,6 +1784,18 @@ PrinceJS.Kid.prototype.damageStruck = function () {
   if (!this.inFallDown) {
     this.land();
   }
+};
+
+PrinceJS.Kid.prototype.die = function (action) {
+  // Check for GOD mode cheat
+  if (PrinceJS.cheats && PrinceJS.cheats.godMode) {
+    // Restore health instead of dying
+    this.health = this.maxHealth;
+    return;
+  }
+  
+  // Call parent die function
+  PrinceJS.Fighter.prototype.die.call(this, action);
 };
 
 PrinceJS.Kid.prototype.proceedOnDead = function () {

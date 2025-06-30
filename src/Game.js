@@ -19,8 +19,18 @@ PrinceJS.Game.prototype = {
     this.game.load.audio("JaffarDead", "assets/music/20_Jaffar_Dead.mp3");
     this.game.load.audio("HeroicDeath", "assets/music/13_Heroic_Death.mp3");
 
-    let levelBasePath = PrinceJS.currentLevel < 90 ? "assets/maps/" : "assets/maps/custom/";
-    this.load.json("level", levelBasePath + "level" + PrinceJS.currentLevel + ".json");
+    // Check if we have a generated level to load
+    if (window.PrinceJS_Generated_Level && window.PrinceJS_Generated_Level.number === PrinceJS.currentLevel) {
+      // Use the generated level data directly
+      this.generatedLevelData = window.PrinceJS_Generated_Level;
+      console.log(`Loading generated level: ${this.generatedLevelData.name}`);
+      // Clear the reference after using it
+      window.PrinceJS_Generated_Level = null;
+    } else {
+      // Load from file system as usual
+      const levelBasePath = PrinceJS.currentLevel < 90 ? "assets/maps/" : "assets/maps/custom/";
+      this.load.json("level", levelBasePath + "level" + PrinceJS.currentLevel + ".json");
+    }
   },
 
   create: function () {
@@ -31,15 +41,21 @@ PrinceJS.Game.prototype = {
     this.pressButtonToNext = false;
 
     if (!PrinceJS.startTime) {
-      let date = new Date();
+      const date = new Date();
       date.setMinutes(date.getMinutes() - (60 - PrinceJS.minutes));
       PrinceJS.startTime = date;
     }
 
-    let json = this.game.cache.getJSON("level");
-    if (!json) {
-      this.restartGame();
-      return;
+    let json;
+    if (this.generatedLevelData) {
+      // Use generated level data and convert to proper format
+      json = this.convertGeneratedLevelToGameFormat(this.generatedLevelData);
+    } else {
+      json = this.game.cache.getJSON("level");
+      if (!json) {
+        this.restartGame();
+        return;
+      }
     }
     this.level = new PrinceJS.LevelBuilder(this.game, this).buildFromJSON(json);
     this.specialEvents = json.prince.specialEvents !== false;
@@ -48,8 +64,8 @@ PrinceJS.Game.prototype = {
     this.shadow = null;
     this.mouse = null;
     for (let i = 0; i < json.guards.length; i++) {
-      let data = json.guards[i];
-      let enemy = new PrinceJS.Enemy(
+      const data = json.guards[i];
+      const enemy = new PrinceJS.Enemy(
         this.game,
         this.level,
         data.location + (data.bias || 0),
@@ -77,7 +93,7 @@ PrinceJS.Game.prototype = {
         this.shadow = enemy;
       }
     }
-    let turn = json.prince.turn !== false;
+    const turn = json.prince.turn !== false;
     let direction = json.prince.direction * (json.prince.reverse || 1);
     if (turn) {
       direction = -direction;
@@ -129,7 +145,11 @@ PrinceJS.Game.prototype = {
     this.input.keyboard.addKey(Phaser.Keyboard.L).onDown.add(this.nextLevelEvent, this);
     this.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR).onDown.add(this.showRemainingMinutes, this);
 
-    this.input.keyboard.onDownCallback = this.buttonPressed.bind(this);
+    // Store global reference for cheat system
+    window.PrinceJS_Game_Instance = this;
+
+    // Set up cheat system keyboard handling
+    this.input.keyboard.onDownCallback = this.handleKeyDown.bind(this);
 
     this.firstUpdate = true;
     if (PrinceJS.danger === null) {
@@ -139,11 +159,98 @@ PrinceJS.Game.prototype = {
     PrinceJS.Utils.updateQuery();
   },
 
+  convertGeneratedLevelToGameFormat: function(generatedLevel) {
+    // Convert AI-generated level format to game-expected format
+    const gameLevel = {
+      level: generatedLevel,
+      guards: [], // Generated levels will have basic guards
+      prince: {
+        location: 58, // Start at bottom-left
+        direction: 1,
+        room: this.findStartRoom(generatedLevel),
+        sword: false,
+        cameraRoom: this.findStartRoom(generatedLevel)
+      }
+    };
+
+    // Add guards/enemies from generated level
+    this.addGeneratedEnemies(generatedLevel, gameLevel);
+    
+    return gameLevel;
+  },
+
+  findStartRoom: function(generatedLevel) {
+    // Find the room in bottom-left (start room)
+    const width = generatedLevel.size.width;
+    const height = generatedLevel.size.height;
+    
+    // Start room should be at bottom-left
+    const startIndex = (height - 1) * width + 0;
+    
+    // Find the actual room ID
+    for (let i = 0; i < generatedLevel.room.length; i++) {
+      if (i === startIndex && generatedLevel.room[i].id !== -1) {
+        return generatedLevel.room[i].id;
+      }
+    }
+    
+    // Fallback: find first valid room
+    for (const room of generatedLevel.room) {
+      if (room.id !== -1) {
+        return room.id;
+      }
+    }
+    
+    return 1; // Ultimate fallback
+  },
+
+  addGeneratedEnemies: function(generatedLevel, gameLevel) {
+    // Look for skeleton tiles in the generated level and create enemies
+    for (const room of generatedLevel.room) {
+      if (room.id === -1 || !room.tile) continue;
+      
+      for (let i = 0; i < room.tile.length; i++) {
+        const tile = room.tile[i];
+        if (tile.element === 21) { // SKELETON tile
+          const x = i % 10;
+          const y = Math.floor(i / 10);
+          
+          // Create enemy data
+          gameLevel.guards.push({
+            location: x * 14 + (y === 2 ? 58 : y === 1 ? 16 : 0), // Rough position calculation
+            direction: 1,
+            room: room.id,
+            skill: 3, // Medium skill
+            colors: 4, // Default guard colors
+            type: "guard"
+          });
+        }
+      }
+    }
+    
+    // Ensure at least some challenge in medium/hard difficulties
+    if (gameLevel.guards.length === 0 && generatedLevel.name.toLowerCase().includes('medium')) {
+      // Add a default guard in a random room
+      const validRooms = generatedLevel.room.filter(r => r.id !== -1);
+      if (validRooms.length > 1) {
+        const randomRoom = validRooms[Math.floor(Math.random() * validRooms.length)];
+        gameLevel.guards.push({
+          location: 58,
+          direction: 1,
+          room: randomRoom.id,
+          skill: 3,
+          colors: 4,
+          type: "guard"
+        });
+      }
+    }
+  },
+
   update: function () {
     if (PrinceJS.Utils.continueGame(this.game)) {
       this.buttonPressed();
-      let pos = PrinceJS.Utils.effectivePointer(this.game);
-      let size = PrinceJS.Utils.effectiveScreenSize(this.game);
+      const pos = PrinceJS.Utils.effectivePointer(this.game);
+      const size = PrinceJS.Utils.effectiveScreenSize(this.game);
       if (
         (PrinceJS.Utils.isScreenFlipped() && pos.y >= 0 && pos.y <= 0.04 * size.height) ||
         (!PrinceJS.Utils.isScreenFlipped() && pos.y >= 0.96 * size.height && pos.y <= size.height)
@@ -175,18 +282,27 @@ PrinceJS.Game.prototype = {
     }
   },
 
-  updateWorld: function () {
-    this.level.update();
-    this.kid.updateActor();
-    for (let i = 0; i < this.enemies.length; i++) {
-      this.enemies[i].updateActor();
+    updateWorld: function () {
+    // Only update game world if cheat menu is not open
+    if (!PrinceJS.Utils.CheatMenu.isOpen) {
+      this.level.update();
+      this.kid.updateActor();
+      for (let i = 0; i < this.enemies.length; i++) {
+        this.enemies[i].updateActor();
+      }
+      if (this.mouse) {
+        this.mouse.updateActor();
+      }
+      this.checkLevelLogic();
+      this.checkTimers();
     }
-    if (this.mouse) {
-      this.mouse.updateActor();
-    }
-    this.checkLevelLogic();
+
+    // Always update UI and apply cheats
     this.ui.updateUI();
-    this.checkTimers();
+
+    // Apply active cheats
+    PrinceJS.Utils.applyCheats(this);
+
     this.firstUpdate = false;
   },
 
@@ -212,7 +328,7 @@ PrinceJS.Game.prototype = {
       case 2:
         if (this.firstUpdate) {
           for (let i = 0; i < this.enemies.length; i++) {
-            let enemy = this.enemies[i];
+            const enemy = this.enemies[i];
             if (enemy && enemy.room === 24 && enemy.charBlockX === 0 && enemy.charBlockY === 1) {
               enemy.charX -= 12;
               enemy.updateBlockXY();
@@ -229,7 +345,7 @@ PrinceJS.Game.prototype = {
             this.kid.room === skeleton.room &&
             Math.abs(this.kid.opponentDistance()) < 999
           ) {
-            let tile = this.level.getTileAt(skeleton.charBlockX, skeleton.charBlockY, skeleton.room);
+            const tile = this.level.getTileAt(skeleton.charBlockX, skeleton.charBlockY, skeleton.room);
             if (tile.element === PrinceJS.Level.TILE_SKELETON) {
               tile.removeObject();
               skeleton.setActive();
@@ -468,9 +584,9 @@ PrinceJS.Game.prototype = {
           if (!["16", "23"].includes(visitedRoom)) {
             return;
           }
-          let tiles = [2, 3, 4, 5, 6, 7].sort(() => Math.random() - 0.5);
+          const tiles = [2, 3, 4, 5, 6, 7].sort(() => Math.random() - 0.5);
           for (let i = 0; i < tiles.length; i++) {
-            let tile = this.kid.level.getTileAt(tiles[i], 2, this.level.rooms[visitedRoom].links.up);
+            const tile = this.kid.level.getTileAt(tiles[i], 2, this.level.rooms[visitedRoom].links.up);
             if (tile.element === PrinceJS.Level.TILE_LOOSE_BOARD && !tile.fallStarted()) {
               tile.shake(true);
               break;
@@ -486,7 +602,7 @@ PrinceJS.Game.prototype = {
           if (!jaffar.alive && !this.level.triggerOpenExitDoor) {
             this.level.triggerOpenExitDoor = true;
             PrinceJS.Utils.delayed(() => {
-              let button = this.level.getTileAt(0, 0, 24);
+              const button = this.level.getTileAt(0, 0, 24);
               if (button.element === PrinceJS.Level.TILE_RAISE_BUTTON) {
                 button.mute = true;
                 button.push();
@@ -511,7 +627,7 @@ PrinceJS.Game.prototype = {
   performProgram: function (program, actor) {
     return program.reduce((promise, operation) => {
       return promise.then(() => {
-        let object = operation.o || actor;
+        const object = operation.o || actor;
         let fn;
         switch (operation.i) {
           case "ACTION":
@@ -610,6 +726,8 @@ PrinceJS.Game.prototype = {
 
   restartGame() {
     this.input.keyboard.onDownCallback = null;
+    // Clear global reference
+    window.PrinceJS_Game_Instance = null;
     PrinceJS.Restart();
     this.state.start("Title");
   },
@@ -755,7 +873,7 @@ PrinceJS.Game.prototype = {
 
   checkGateFastDropped: function (gate) {
     for (let i = 0; i < this.enemies.length; i++) {
-      let enemy = this.enemies[i];
+      const enemy = this.enemies[i];
       if (enemy.room === gate.room) {
         if (enemy.faceL() && enemy.charBlockX <= gate.roomX) {
           enemy.turn();
@@ -774,7 +892,7 @@ PrinceJS.Game.prototype = {
     let currentEnemy;
     // Same Room / Same BlockY
     for (let i = 0; i < this.enemies.length; i++) {
-      let enemy = this.enemies[i];
+      const enemy = this.enemies[i];
       if (enemy.alive && this.kid.charBlockY === enemy.charBlockY && this.kid.opponentInSameRoom(enemy, room)) {
         currentEnemy = enemy;
         break;
@@ -783,7 +901,7 @@ PrinceJS.Game.prototype = {
     // Near Room / Same BlockY
     if (!currentEnemy) {
       for (let i = 0; i < this.enemies.length; i++) {
-        let enemy = this.enemies[i];
+        const enemy = this.enemies[i];
         if (enemy.alive && this.kid.charBlockY === enemy.charBlockY && this.kid.opponentNearRoom(enemy, room)) {
           currentEnemy = enemy;
           break;
@@ -793,7 +911,7 @@ PrinceJS.Game.prototype = {
     // Same Room
     if (!currentEnemy) {
       for (let i = 0; i < this.enemies.length; i++) {
-        let enemy = this.enemies[i];
+        const enemy = this.enemies[i];
         if (enemy.alive && this.kid.opponentInSameRoom(enemy, room)) {
           currentEnemy = enemy;
           break;
@@ -803,7 +921,7 @@ PrinceJS.Game.prototype = {
     // Near Room
     if (!currentEnemy) {
       for (let i = 0; i < this.enemies.length; i++) {
-        let enemy = this.enemies[i];
+        const enemy = this.enemies[i];
         if (enemy.alive && this.kid.opponentNearRoom(enemy, room)) {
           currentEnemy = enemy;
           break;
@@ -855,5 +973,22 @@ PrinceJS.Game.prototype = {
     for (let i = 0; i < this.enemies.length; i++) {
       this.enemies[i].checkLooseFloor(tile);
     }
+  },
+
+  handleKeyDown: function (event) {
+    // Handle cheat menu keys first
+    if (PrinceJS.Utils.handleCheatKeys(event.keyCode, 'game')) {
+      event.preventDefault();
+      return;
+    }
+
+    // Block all input if cheat menu is open
+    if (PrinceJS.Utils.CheatMenu.isOpen) {
+      event.preventDefault();
+      return;
+    }
+
+    // Original button pressed logic
+    this.buttonPressed();
   }
 };

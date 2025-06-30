@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PrinceJS Level Generator Test</title>
+    <style>
+        body {
+            font-family: monospace;
+            margin: 20px;
+            background: #222;
+            color: #fff;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .controls {
+            background: #333;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .output {
+            background: #111;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #555;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        button {
+            background: #0066cc;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 5px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        button:hover {
+            background: #0080ff;
+        }
+        input, select {
+            background: #444;
+            color: white;
+            border: 1px solid #666;
+            padding: 8px;
+            margin: 5px;
+            border-radius: 4px;
+        }
+        .level-preview {
+            font-family: monospace;
+            font-size: 12px;
+            background: #000;
+            padding: 10px;
+            border: 1px solid #666;
+            margin: 10px 0;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🏰 PrinceJS AI Level Generator Test</h1>
+        
+        <div class="controls">
+            <h2>Generate Level</h2>
+            <div>
+                <label>Width (3-9): <input type="number" id="width" value="5" min="3" max="9"></label>
+                <label>Height (3-5): <input type="number" id="height" value="3" min="3" max="5"></label>
+            </div>
+            <div>
+                <label>Difficulty: 
+                    <select id="difficulty">
+                        <option value="easy">Easy</option>
+                        <option value="medium" selected>Medium</option>
+                        <option value="hard">Hard</option>
+                    </select>
+                </label>
+                <label>Theme: 
+                    <select id="theme">
+                        <option value="balanced" selected>Balanced</option>
+                        <option value="puzzle">Puzzle</option>
+                        <option value="combat">Combat</option>
+                        <option value="parkour">Parkour</option>
+                    </select>
+                </label>
+            </div>
+            <div>
+                <label>Level Name: <input type="text" id="levelName" value="AI Generated Level"></label>
+            </div>
+            <div>
+                <button onclick="generateLevel()">🎲 Generate Level</button>
+                <button onclick="generateSeries()">📦 Generate Series (5 levels)</button>
+                <button onclick="clearOutput()">🗑️ Clear Output</button>
+            </div>
+        </div>
+
+        <div class="output" id="output">
+            <p>Click "Generate Level" to create an AI-generated Prince of Persia level!</p>
+            <p><strong>Features:</strong></p>
+            <ul>
+                <li>✅ Guaranteed walkable and climbable paths</li>
+                <li>✅ Solvable puzzles with buttons and gates</li>
+                <li>✅ Proper exits and connectivity validation</li>
+                <li>✅ Difficulty-based enemy and trap placement</li>
+                <li>✅ Theme-based level design (balanced, puzzle, combat, parkour)</li>
+                <li>✅ Automatic pathfinding validation</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // Mock PrinceJS namespace for testing
+        window.PrinceJS = {
+            Level: {
+                TYPE_DUNGEON: 0,
+                TYPE_PALACE: 1,
+                TILE_SPACE: 0,
+                TILE_FLOOR: 1,
+                TILE_SPIKES: 2,
+                TILE_PILLAR: 3,
+                TILE_GATE: 4,
+                TILE_STUCK_BUTTON: 5,
+                TILE_DROP_BUTTON: 6,
+                TILE_TAPESTRY: 7,
+                TILE_BOTTOM_BIG_PILLAR: 8,
+                TILE_TOP_BIG_PILLAR: 9,
+                TILE_POTION: 10,
+                TILE_LOOSE_BOARD: 11,
+                TILE_TAPESTRY_TOP: 12,
+                TILE_MIRROR: 13,
+                TILE_DEBRIS: 14,
+                TILE_RAISE_BUTTON: 15,
+                TILE_EXIT_LEFT: 16,
+                TILE_EXIT_RIGHT: 17,
+                TILE_CHOPPER: 18,
+                TILE_TORCH: 19,
+                TILE_WALL: 20,
+                TILE_SKELETON: 21,
+                TILE_SWORD: 22
+            }
+        };
+
+        // Load the level generator
+        function loadLevelGenerator() {
+            return fetch('/src/LevelGenerator.js')
+                .then(response => response.text())
+                .then(code => {
+                    // Remove the import statement and execute
+                    const cleanCode = code.replace('"use strict";', '');
+                    eval(cleanCode);
+                });
+        }
+
+        function generateLevel() {
+            const width = parseInt(document.getElementById('width').value);
+            const height = parseInt(document.getElementById('height').value);
+            const difficulty = document.getElementById('difficulty').value;
+            const theme = document.getElementById('theme').value;
+            const levelName = document.getElementById('levelName').value || 'AI Generated Level';
+
+            if (!PrinceJS.LevelGenerator) {
+                appendOutput('❌ Level Generator not loaded. Loading...', 'error');
+                loadLevelGenerator().then(() => {
+                    generateLevel();
+                });
+                return;
+            }
+
+            try {
+                const startTime = performance.now();
+                
+                const options = {
+                    number: 999,
+                    name: levelName,
+                    width: width,
+                    height: height,
+                    type: 0, // Dungeon
+                    difficulty: difficulty,
+                    theme: theme
+                };
+
+                appendOutput(`🎲 Generating level: "${levelName}" (${width}x${height}, ${difficulty}, ${theme})...`);
+                
+                const level = PrinceJS.LevelGenerator.generateLevel(options);
+                const endTime = performance.now();
+                
+                appendOutput(`✅ Level generated successfully in ${(endTime - startTime).toFixed(2)}ms!`);
+                appendOutput(`📋 Level Details:`);
+                appendOutput(`   Name: ${level.name}`);
+                appendOutput(`   Size: ${level.size.width}x${level.size.height} rooms`);
+                appendOutput(`   Type: ${level.type === 0 ? 'Dungeon' : 'Palace'}`);
+                appendOutput(`   Total Rooms: ${level.room.filter(r => r.id !== -1).length}`);
+                
+                // Show level preview
+                showLevelPreview(level);
+                
+                // Offer download
+                downloadLevel(level);
+                
+            } catch (error) {
+                appendOutput(`❌ Generation failed: ${error.message}`, 'error');
+                console.error(error);
+            }
+        }
+
+        function generateSeries() {
+            if (!PrinceJS.LevelGenerator) {
+                appendOutput('❌ Level Generator not loaded. Loading...', 'error');
+                loadLevelGenerator().then(() => {
+                    generateSeries();
+                });
+                return;
+            }
+
+            try {
+                const startTime = performance.now();
+                appendOutput(`📦 Generating level series...`);
+                
+                const levels = PrinceJS.LevelGenerator.generateLevelSeries(5, 100);
+                const endTime = performance.now();
+                
+                appendOutput(`✅ Generated ${levels.length} levels in ${(endTime - startTime).toFixed(2)}ms!`);
+                
+                levels.forEach((level, index) => {
+                    appendOutput(`   ${index + 1}. ${level.name} (${level.size.width}x${level.size.height})`);
+                });
+                
+                // Download all levels as ZIP would be ideal, but for now just download the first one
+                downloadLevel(levels[0]);
+                
+            } catch (error) {
+                appendOutput(`❌ Series generation failed: ${error.message}`, 'error');
+                console.error(error);
+            }
+        }
+
+        function showLevelPreview(level) {
+            const preview = document.createElement('div');
+            preview.className = 'level-preview';
+            
+            let previewText = `🗺️ Level Preview (${level.name}):\n\n`;
+            
+            // Create a simple ASCII representation
+            const width = level.size.width;
+            const height = level.size.height;
+            
+            for (let y = 0; y < height; y++) {
+                for (let x = 0; x < width; x++) {
+                    const roomIndex = y * width + x;
+                    const room = level.room[roomIndex];
+                    
+                    if (room.id === -1) {
+                        previewText += '░ ';
+                    } else {
+                        // Check room contents
+                        const hasExit = room.tile.some(t => t.element === 17);
+                        const hasButton = room.tile.some(t => [15, 6].includes(t.element));
+                        const hasEnemy = room.tile.some(t => t.element === 21);
+                        const hasPotion = room.tile.some(t => t.element === 10);
+                        
+                        if (hasExit) previewText += '🚪';
+                        else if (hasEnemy) previewText += '👹';
+                        else if (hasButton) previewText += '🔘';
+                        else if (hasPotion) previewText += '🧪';
+                        else previewText += '▓ ';
+                    }
+                }
+                previewText += '\n';
+            }
+            
+            previewText += '\nLegend: 🚪=Exit 👹=Enemy 🔘=Button 🧪=Potion ▓=Room ░=Empty';
+            preview.textContent = previewText;
+            
+            document.getElementById('output').appendChild(preview);
+        }
+
+        function downloadLevel(level) {
+            const dataStr = JSON.stringify(level, null, 2);
+            const dataBlob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(dataBlob);
+            
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `${level.name.replace(/[^a-zA-Z0-9]/g, '_')}_level${level.number}.json`;
+            link.textContent = `💾 Download ${level.name}`;
+            link.style.display = 'block';
+            link.style.color = '#4CAF50';
+            link.style.margin = '10px 0';
+            
+            document.getElementById('output').appendChild(link);
+            
+            appendOutput(`💾 Download link created: ${link.download}`);
+        }
+
+        function appendOutput(text, type = 'info') {
+            const output = document.getElementById('output');
+            const p = document.createElement('p');
+            p.textContent = text;
+            
+            if (type === 'error') {
+                p.style.color = '#ff4444';
+            } else if (type === 'success') {
+                p.style.color = '#44ff44';
+            }
+            
+            output.appendChild(p);
+            output.scrollTop = output.scrollHeight;
+        }
+
+        function clearOutput() {
+            document.getElementById('output').innerHTML = '<p>Output cleared. Ready for new generation!</p>';
+        }
+
+        // Load the level generator on page load
+        window.addEventListener('load', () => {
+            appendOutput('🔄 Loading Level Generator...');
+            loadLevelGenerator()
+                .then(() => {
+                    appendOutput('✅ Level Generator loaded successfully!');
+                    appendOutput('🎮 Ready to generate levels!');
+                })
+                .catch(error => {
+                    appendOutput(`❌ Failed to load Level Generator: ${error.message}`, 'error');
+                });
+        });
+    </script>
+</body>
+</html>
