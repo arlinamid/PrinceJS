@@ -22,20 +22,20 @@ PrinceJS.Scene.prototype = {
     this.game.add.image(0, 0, "cutscene", "room", this.back);
     this.game.add.image(0, 142, "cutscene", "room_bed", this.back);
 
-    let torchPos = [
+    const torchPos = [
       { x: 53, y: 81 },
       { x: 171, y: 81 }
     ];
     let i;
     for (i = 0; i < torchPos.length; i++) {
-      let torch = new PrinceJS.Tile.Torch(this.game, PrinceJS.Level.TILE_TORCH, 0, PrinceJS.Level.TYPE_PALACE);
+      const torch = new PrinceJS.Tile.Torch(this.game, PrinceJS.Level.TILE_TORCH, 0, PrinceJS.Level.TYPE_PALACE);
       torch.x = torchPos[i].x;
       torch.y = torchPos[i].y;
       torch.back.frameName = "palace_0";
       this.addObject(torch);
     }
 
-    let starPos = [
+    const starPos = [
       { x: 20, y: 97 },
       { x: 16, y: 104 },
       { x: 23, y: 110 },
@@ -44,7 +44,7 @@ PrinceJS.Scene.prototype = {
       { x: 18, y: 128 }
     ];
     for (i = 0; i < starPos.length; i++) {
-      let star = new PrinceJS.Tile.Star(this.game, starPos[i].x, starPos[i].y);
+      const star = new PrinceJS.Tile.Star(this.game, starPos[i].x, starPos[i].y);
       this.addObject(star);
     }
 

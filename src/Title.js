@@ -52,7 +52,7 @@ PrinceJS.Title.prototype = {
       }, 3500);
     });
 
-    this.input.keyboard.onDownCallback = this.play.bind(this);
+    this.input.keyboard.onDownCallback = this.handleKeyDown.bind(this);
   },
 
   update: function () {
@@ -108,5 +108,22 @@ PrinceJS.Title.prototype = {
 
   stopMusic: function () {
     this.game.sound.stopAll();
+  },
+
+  handleKeyDown: function (event) {
+    // Handle cheat menu keys first
+    if (PrinceJS.Utils.handleCheatKeys(event.keyCode, 'title')) {
+      event.preventDefault();
+      return;
+    }
+
+    // Block all input if cheat menu is open
+    if (PrinceJS.Utils.CheatMenu.isOpen) {
+      event.preventDefault();
+      return;
+    }
+
+    // Original play logic
+    this.play();
   }
 };

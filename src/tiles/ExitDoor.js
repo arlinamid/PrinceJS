@@ -34,7 +34,7 @@ PrinceJS.Tile.ExitDoor.prototype.constructor = PrinceJS.Tile.ExitDoor;
 PrinceJS.Tile.ExitDoor.prototype.toggleMask = function () {};
 
 PrinceJS.Tile.ExitDoor.prototype.update = function () {
-  let door = this.tileChildBack;
+  const door = this.tileChildBack;
 
   switch (this.state) {
     case PrinceJS.Tile.ExitDoor.STATE_RAISING:
@@ -59,7 +59,7 @@ PrinceJS.Tile.ExitDoor.prototype.update = function () {
 
 PrinceJS.Tile.ExitDoor.prototype.initCrop = function () {
   if (this.open) {
-    let door = this.tileChildBack;
+    const door = this.tileChildBack;
     door.crop(new Phaser.Rectangle(0, this.heightCrop, door.width, door.height));
   }
 };

@@ -58,11 +58,11 @@ PrinceJS.Actor.prototype.registerCommand = function (value, fn) {
 };
 
 PrinceJS.Actor.prototype.updateCharFrame = function () {
-  let framedef = this.anims.framedef[this.charFrame];
+  const framedef = this.anims.framedef[this.charFrame];
   this.charFdx = framedef.fdx;
   this.charFdy = framedef.fdy;
 
-  let fcheck = parseInt(framedef.fcheck, 16);
+  const fcheck = parseInt(framedef.fcheck, 16);
   this.charFfoot = fcheck & 0x1f;
   this.charFood = (fcheck & 0x80) === 0x80;
   this.charFcheck = (fcheck & 0x40) === 0x40;
@@ -105,7 +105,7 @@ PrinceJS.Actor.prototype.processCommand = function () {
   this.processing = true;
 
   while (this.processing) {
-    let data = this.anims.sequence[this._action][this._seqpointer];
+    const data = this.anims.sequence[this._action][this._seqpointer];
     this.commands[data.cmd](data);
 
     this._seqpointer++;

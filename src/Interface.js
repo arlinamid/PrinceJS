@@ -4,28 +4,28 @@ PrinceJS.Interface = function (game, delegate) {
   this.game = game;
   this.delegate = delegate;
 
-  let bmd = this.game.make.bitmapData(PrinceJS.SCREEN_WIDTH, PrinceJS.UI_HEIGHT);
+  const bmd = this.game.make.bitmapData(PrinceJS.SCREEN_WIDTH, PrinceJS.UI_HEIGHT);
   bmd.fill(0, 0, 0);
 
   this.layer = this.game.add.sprite(0, (PrinceJS.SCREEN_HEIGHT - PrinceJS.UI_HEIGHT) * PrinceJS.SCALE_FACTOR, bmd);
   this.layer.fixedToCamera = true;
 
-  let bmdRed = this.game.make.bitmapData(PrinceJS.SCREEN_WIDTH, PrinceJS.UI_HEIGHT);
+  const bmdRed = this.game.make.bitmapData(PrinceJS.SCREEN_WIDTH, PrinceJS.UI_HEIGHT);
   bmdRed.fill(255, 0, 0);
   this.layerRed = this.game.add.sprite(0, 0, bmdRed);
   this.layerRed.visible = false;
   this.layer.addChild(this.layerRed);
-  let bmdGreen = this.game.make.bitmapData(PrinceJS.SCREEN_WIDTH, PrinceJS.UI_HEIGHT);
+  const bmdGreen = this.game.make.bitmapData(PrinceJS.SCREEN_WIDTH, PrinceJS.UI_HEIGHT);
   bmdGreen.fill(0, 255, 0);
   this.layerGreen = this.game.add.sprite(0, 0, bmdGreen);
   this.layerGreen.visible = false;
   this.layer.addChild(this.layerGreen);
-  let bmdYellow = this.game.make.bitmapData(PrinceJS.SCREEN_WIDTH, PrinceJS.UI_HEIGHT);
+  const bmdYellow = this.game.make.bitmapData(PrinceJS.SCREEN_WIDTH, PrinceJS.UI_HEIGHT);
   bmdYellow.fill(255, 255, 0);
   this.layerYellow = this.game.add.sprite(0, 0, bmdYellow);
   this.layerYellow.visible = false;
   this.layer.addChild(this.layerYellow);
-  let bmdWhite = this.game.make.bitmapData(PrinceJS.SCREEN_WIDTH, PrinceJS.UI_HEIGHT);
+  const bmdWhite = this.game.make.bitmapData(PrinceJS.SCREEN_WIDTH, PrinceJS.UI_HEIGHT);
   bmdWhite.fill(255, 255, 255);
   this.layerWhite = this.game.add.sprite(0, 0, bmdWhite);
   this.layerWhite.visible = false;
@@ -56,6 +56,10 @@ PrinceJS.Interface = function (game, delegate) {
   this.pressButtonToContinueTimer = -1;
   this.hideTextTimer = -1;
 
+  // Cheat notification system
+  this.cheatNotificationTimer = -1;
+  this.cheatNotificationText = '';
+
   PrinceJS.InterfaceCurrent = this;
 };
 
@@ -77,7 +81,7 @@ PrinceJS.Interface.prototype = {
   },
 
   damagePlayerLive: function (num) {
-    let n = Math.min(this.playerHPActive, num);
+    const n = Math.min(this.playerHPActive, num);
     for (let i = 0; i < n; i++) {
       this.playerHPActive--;
       this.playerHPs[this.playerHPActive].frameName = "kid-emptylive";
@@ -93,7 +97,7 @@ PrinceJS.Interface.prototype = {
   addPlayerLive: function () {
     this.playerHPActive = this.playerHPs.length;
     if (this.playerHPs.length < 10) {
-      let hp = this.game.add.sprite(this.playerHPActive * 7, 2, "general", "kid-live");
+      const hp = this.game.add.sprite(this.playerHPActive * 7, 2, "general", "kid-live");
       this.playerHPs[this.playerHPActive] = hp;
       this.layer.addChild(hp);
       this.playerHPActive++;
@@ -156,7 +160,7 @@ PrinceJS.Interface.prototype = {
       return;
     }
 
-    let n = Math.min(this.oppHPActive, num);
+    const n = Math.min(this.oppHPActive, num);
     for (let i = 0; i < n; i++) {
       this.oppHPActive--;
       this.oppHPs[this.oppHPActive].visible = false;
@@ -196,6 +200,17 @@ PrinceJS.Interface.prototype = {
         this.hideText();
       }
     }
+
+    // Handle cheat notifications
+    if (this.cheatNotificationTimer > -1) {
+      this.cheatNotificationTimer--;
+      if (this.cheatNotificationTimer === 0) {
+        this.hideCheatNotification();
+      }
+    }
+
+    // Show active cheats indicator
+    this.updateCheatStatus();
   },
 
   showLevel: function () {
@@ -236,7 +251,7 @@ PrinceJS.Interface.prototype = {
     if (this.showTextType && !force) {
       return;
     }
-    let minutes = PrinceJS.Utils.getRemainingMinutes();
+    const minutes = PrinceJS.Utils.getRemainingMinutes();
     this.showText(minutes + (minutes === 1 ? " MINUTE " : " MINUTES ") + "LEFT", "minutes");
     this.hideTextTimer = 30;
   },
@@ -295,5 +310,35 @@ PrinceJS.Interface.prototype = {
     Object.keys(this.flashMap).forEach((color) => {
       this.flashMap[color].visible = color === String(flashColor);
     });
+  },
+
+  showCheatNotification: function (message, duration = 60) {
+    this.cheatNotificationText = message;
+    this.cheatNotificationTimer = duration;
+    this.showText(message, "cheat");
+  },
+
+  hideCheatNotification: function () {
+    if (this.showTextType === "cheat") {
+      this.hideText();
+    }
+    this.cheatNotificationTimer = -1;
+    this.cheatNotificationText = '';
+  },
+
+  updateCheatStatus: function () {
+    // Only show cheat status if no other text is being displayed
+    if (this.showTextType || !PrinceJS.cheats) {
+      return;
+    }
+
+    const activeCheats = [];
+    if (PrinceJS.cheats.infiniteHealth) activeCheats.push("∞HP");
+    if (PrinceJS.cheats.infiniteTime) activeCheats.push("∞TIME");
+    if (PrinceJS.cheats.godMode) activeCheats.push("GOD");
+
+    if (activeCheats.length > 0) {
+      this.showText("CHEATS: " + activeCheats.join(" | "), "cheatStatus");
+    }
   }
 };

@@ -1,2 +1,21 @@
-lib/
+# Dependencies
 node_modules/
+
+# Build outputs
+dist/
+build/
+
+# Libraries
+lib/
+
+# Public assets
+public/
+
+# Converter scripts (different code style)
+converter/
+
+# Minified files
+*.min.js
+
+# Config files that don't need strict linting
+vite.config.js

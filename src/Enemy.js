@@ -88,6 +88,14 @@ PrinceJS.Enemy.prototype.updateBehaviour = function () {
   if (!this.opponent.alive) {
     return;
   }
+
+  // Use new AI system if available
+  if (typeof PrinceJS.AI !== 'undefined' && this.useAdvancedAI) {
+    this.updateAdvancedBehaviour();
+    return;
+  }
+
+  // Original behavior for backwards compatibility
   if (this.willStartFight()) {
     PrinceJS.Utils.delayed(
       () => {
@@ -118,7 +126,7 @@ PrinceJS.Enemy.prototype.updateBehaviour = function () {
     return;
   }
 
-  let distance = this.opponentDistance();
+  const distance = this.opponentDistance();
   if (distance === -999) {
     return;
   }
@@ -161,14 +169,14 @@ PrinceJS.Enemy.prototype.enemyAdvance = function () {
     return;
   }
 
-  let tile = this.level.getTileAt(this.charBlockX, this.charBlockY, this.room);
+  const tile = this.level.getTileAt(this.charBlockX, this.charBlockY, this.room);
   if (tile.isSpace() && !["advance", "retreat", "strike"].includes(this.action)) {
     this.startFall();
     return;
   }
 
-  let tileF = this.level.getTileAt(this.charBlockX + this.charFace, this.charBlockY, this.room);
-  let tileR = this.level.getTileAt(this.charBlockX - this.charFace, this.charBlockY, this.room);
+  const tileF = this.level.getTileAt(this.charBlockX + this.charFace, this.charBlockY, this.room);
+  const tileR = this.level.getTileAt(this.charBlockX - this.charFace, this.charBlockY, this.room);
   if (this.canWalkSafely(tileF, true)) {
     this.advance();
   } else {
@@ -224,7 +232,7 @@ PrinceJS.Enemy.prototype.retreat = function () {
     return;
   }
 
-  let tileR = this.level.getTileAt(this.charBlockX - this.charFace, this.charBlockY, this.room);
+  const tileR = this.level.getTileAt(this.charBlockX - this.charFace, this.charBlockY, this.room);
   if (this.canWalkSafely(tileR)) {
     PrinceJS.Fighter.prototype.retreat.call(this);
   }
@@ -242,8 +250,8 @@ PrinceJS.Enemy.prototype.advance = function () {
     this.opponent.opponent = this;
   }
 
-  let tileF = this.level.getTileAt(this.charBlockX + this.charFace, this.charBlockY, this.room);
-  let tileFF = this.level.getTileAt(this.charBlockX + 2 * this.charFace, this.charBlockY, this.room);
+  const tileF = this.level.getTileAt(this.charBlockX + this.charFace, this.charBlockY, this.room);
+  const tileFF = this.level.getTileAt(this.charBlockX + 2 * this.charFace, this.charBlockY, this.room);
   if (this.canWalkSafely(tileF, true) && (!this.opponent.isHanging() || this.canWalkSafely(tileFF, true))) {
     PrinceJS.Fighter.prototype.advance.call(this);
   }
@@ -406,14 +414,14 @@ PrinceJS.Enemy.prototype.checkBarrier = function () {
     return;
   }
 
-  let tile = this.level.getTileAt(this.charBlockX, this.charBlockY, this.room);
+  const tile = this.level.getTileAt(this.charBlockX, this.charBlockY, this.room);
   if (this.moveR() && tile.isBarrier()) {
     if (tile.intersects(this.getCharBounds())) {
       this.bump(tile);
     }
   } else {
-    let blockX = PrinceJS.Utils.convertXtoBlockX(this.charX + this.charFdx * this.charFace - 12);
-    let tileNext = this.level.getTileAt(blockX, this.charBlockY, this.room);
+    const blockX = PrinceJS.Utils.convertXtoBlockX(this.charX + this.charFdx * this.charFace - 12);
+    const tileNext = this.level.getTileAt(blockX, this.charBlockY, this.room);
     if (tileNext.isBarrier()) {
       switch (tileNext.element) {
         case PrinceJS.Level.TILE_WALL:
@@ -452,4 +460,95 @@ PrinceJS.Enemy.prototype.appearOutOfMirror = function (mirror) {
   this.updateCharPosition();
   this.processCommand();
   this.setVisible();
+};
+
+// Advanced AI behavior methods
+PrinceJS.Enemy.prototype.updateAdvancedBehaviour = function () {
+  // Handle timers
+  if (this.refracTimer > 0) {
+    this.refracTimer--;
+  }
+  if (this.blockTimer > 0) {
+    this.blockTimer--;
+  }
+  if (this.strikeTimer > 0) {
+    this.strikeTimer--;
+  }
+
+  // Check if enemy is in action that prevents AI decisions
+  if (
+    this.action === "stabbed" ||
+    this.action === "stabkill" ||
+    this.action === "dropdead" ||
+    this.action === "stepfall"
+  ) {
+    return;
+  }
+
+  // Initialize fight if needed
+  if (this.willStartFight()) {
+    PrinceJS.Utils.delayed(
+      () => {
+        if (this.willStartFight()) {
+          this.startFight = true;
+        }
+      },
+      this.baseCharName === "jaffar" ? 2300 : 500
+    );
+  }
+
+  // Use AI system to make decision
+  const aiDecision = PrinceJS.AI.makeDecision(this);
+  this.executeAIDecision(aiDecision);
+};
+
+PrinceJS.Enemy.prototype.executeAIDecision = function (decision) {
+  switch (decision) {
+    case 'engarde':
+      if (this.hasSword && this.startFight) {
+        this.lookBelow = true;
+        this.engarde();
+      }
+      break;
+    case 'advance':
+      this.advance();
+      break;
+    case 'retreat':
+      this.retreat();
+      break;
+    case 'strike':
+      this.strike();
+      break;
+    case 'block':
+      this.block();
+      break;
+    case 'turn':
+      this.turnengarde();
+      break;
+    case 'stand':
+    default:
+      this.stand();
+      break;
+  }
+};
+
+// AI configuration methods
+PrinceJS.Enemy.prototype.setAIType = function (aiType) {
+  this.useAdvancedAI = true;
+  if (typeof PrinceJS.AI !== 'undefined') {
+    PrinceJS.AI.setAIType(this, aiType);
+  }
+};
+
+PrinceJS.Enemy.prototype.enableAdvancedAI = function () {
+  this.useAdvancedAI = true;
+  if (typeof PrinceJS.AI !== 'undefined') {
+    PrinceJS.AI.updateAIForLevel(this, this.level.number);
+  }
+};
+
+PrinceJS.Enemy.prototype.disableAdvancedAI = function () {
+  this.useAdvancedAI = false;
+  this.aiType = null;
+  this.patrolData = null;
 };

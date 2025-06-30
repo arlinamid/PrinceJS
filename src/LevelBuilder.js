@@ -36,7 +36,7 @@ PrinceJS.LevelBuilder.prototype = {
       this.layout[y] = [];
 
       for (x = 0; x < this.width; x++) {
-        let index = y * this.width + x;
+        const index = y * this.width + x;
         id = json.room[index].id;
 
         this.layout[y][x] = id;
@@ -95,15 +95,15 @@ PrinceJS.LevelBuilder.prototype = {
   buildRoom: function (id, startId, startLocation) {
     for (let y = 2; y >= 0; y--) {
       for (let x = 0; x < 10; x++) {
-        let tile = this.buildTile(x, y, id, startId, startLocation);
+        const tile = this.buildTile(x, y, id, startId, startLocation);
         this.level.addTile(x, y, id, tile);
       }
     }
   },
 
   buildTile: function (x, y, id, startId, startLocation) {
-    let tileNumber = y * 10 + x;
-    let t = this.level.rooms[id].tiles[tileNumber];
+    const tileNumber = y * 10 + x;
+    const t = this.level.rooms[id].tiles[tileNumber];
 
     let tile, tileChild, tileSeed, wallType, open;
     switch (t.element) {
@@ -130,7 +130,7 @@ PrinceJS.LevelBuilder.prototype = {
         if (this.type === PrinceJS.Level.TYPE_DUNGEON) {
           tile.front.frameName = wallType + "_" + tileSeed;
         } else {
-          let bmd = this.game.make.bitmapData(60, 79);
+          const bmd = this.game.make.bitmapData(60, 79);
 
           bmd.rect(0, 16, 32, 20, this.wallColor[this.wallPattern[id][y * 44 + x]]);
           bmd.rect(0, 36, 16, 21, this.wallColor[this.wallPattern[id][y * 44 + 11 + x]]);
@@ -173,7 +173,7 @@ PrinceJS.LevelBuilder.prototype = {
       case PrinceJS.Level.TILE_POTION:
         tile = new PrinceJS.Tile.Potion(this.game, t.modifier, this.type);
         if (tile.isSpecial) {
-          let specialTile = this.getTileObjectAt(0, 0, 8);
+          const specialTile = this.getTileObjectAt(0, 0, 8);
           if (specialTile) {
             tile.specialModifier = specialTile.modifier;
             tile.onDrank.add(this.delegate.fireEvent, this.delegate);
@@ -313,7 +313,7 @@ PrinceJS.LevelBuilder.prototype = {
   },
 
   getTileAt: function (x, y, id) {
-    let tile = this.getTileObjectAt(x, y, id);
+    const tile = this.getTileObjectAt(x, y, id);
     if (!tile) {
       return PrinceJS.Level.TILE_WALL;
     }
@@ -338,7 +338,7 @@ PrinceJS.LevelBuilder.prototype = {
 
     for (let row = 0; row < 3; row++) {
       for (let subrow = 0; subrow < 4; subrow++) {
-        let colorBase = subrow % 2 ? 0 : 4;
+        const colorBase = subrow % 2 ? 0 : 4;
         let prevColor = -1;
 
         for (let col = 0; col <= 10; ++col) {

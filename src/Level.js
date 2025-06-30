@@ -104,11 +104,11 @@ PrinceJS.Level.prototype = {
   },
 
   removeObject: function (x, y, room) {
-    let tile = this.getTileAt(x, y, room);
+    const tile = this.getTileAt(x, y, room);
     if (tile && tile.removeObject) {
       tile.removeObject();
 
-      let idx = this.trobs.indexOf(tile);
+      const idx = this.trobs.indexOf(tile);
       if (idx > -1) {
         this.trobs.splice(idx, 1);
       }
@@ -178,7 +178,7 @@ PrinceJS.Level.prototype = {
 
   shakeFloor: function (y, room) {
     for (let x = 0; x < 10; x++) {
-      let tile = this.getTileAt(x, y, room);
+      const tile = this.getTileAt(x, y, room);
 
       if (tile.element === PrinceJS.Level.TILE_LOOSE_BOARD) {
         tile.shake(false);
@@ -194,7 +194,7 @@ PrinceJS.Level.prototype = {
   },
 
   maskTile: function (x, y, room, actor) {
-    let tile = this.getTileAt(x, y, room);
+    const tile = this.getTileAt(x, y, room);
 
     if (this.maskedTiles[actor.id] === tile) {
       return;
@@ -210,7 +210,7 @@ PrinceJS.Level.prototype = {
   },
 
   floorStartFall: function (tile) {
-    let space = new PrinceJS.Tile.Base(this.game, PrinceJS.Level.TILE_SPACE, 0, tile.type);
+    const space = new PrinceJS.Tile.Base(this.game, PrinceJS.Level.TILE_SPACE, 0, tile.type);
     if (tile.type === PrinceJS.Level.TYPE_PALACE) {
       space.back.frameName = tile.key + "_0_1";
     }
@@ -228,7 +228,7 @@ PrinceJS.Level.prototype = {
   },
 
   floorStopFall: function (tile) {
-    let floor = this.getTileAt(tile.roomX, tile.roomY, tile.room);
+    const floor = this.getTileAt(tile.roomX, tile.roomY, tile.room);
     if (floor.element !== PrinceJS.Level.TILE_SPACE) {
       tile.destroy();
       floor.addDebris();
@@ -242,9 +242,9 @@ PrinceJS.Level.prototype = {
     if (!this.events[event]) {
       return;
     }
-    let room = this.events[event].room;
-    let x = (this.events[event].location - 1) % 10;
-    let y = Math.floor((this.events[event].location - 1) / 10);
+    const room = this.events[event].room;
+    const x = (this.events[event].location - 1) % 10;
+    const y = Math.floor((this.events[event].location - 1) / 10);
 
     let tile = this.getTileAt(x, y, room);
 
@@ -281,7 +281,7 @@ PrinceJS.Level.prototype = {
   },
 
   checkGates: function (room, prevRoom) {
-    let gates = this.getGatesAll(room, prevRoom);
+    const gates = this.getGatesAll(room, prevRoom);
     this.activeGates.forEach((gate) => {
       if (!gates.includes(gate)) {
         gate.isVisible(false);
@@ -294,7 +294,7 @@ PrinceJS.Level.prototype = {
   },
 
   getGatesAll: function (room, prevRoom) {
-    let gates = [...this.getGates(room), ...this.getGatesLeft(room)];
+    const gates = [...this.getGates(room), ...this.getGatesLeft(room)];
     if (prevRoom) {
       if (room && this.rooms[room]) {
         if (this.rooms[room].links.up === prevRoom) {
@@ -309,7 +309,7 @@ PrinceJS.Level.prototype = {
   },
 
   getGates: function (room, edgeX, edgeY) {
-    let gates = [];
+    const gates = [];
     if (room && this.rooms[room]) {
       this.rooms[room].tiles.forEach((tile) => {
         if (tile.element === PrinceJS.Level.TILE_GATE) {
@@ -329,9 +329,9 @@ PrinceJS.Level.prototype = {
   },
 
   getGatesLeft: function (room) {
-    let gates = [];
+    const gates = [];
     if (room && this.rooms[room]) {
-      let roomLeft = this.rooms[room].links.left;
+      const roomLeft = this.rooms[room].links.left;
       if (roomLeft > 0) {
         gates.push(...this.getGates(roomLeft, 9));
       }
@@ -340,9 +340,9 @@ PrinceJS.Level.prototype = {
   },
 
   getGatesRight: function (room) {
-    let gates = [];
+    const gates = [];
     if (room && this.rooms[room]) {
-      let roomRight = this.rooms[room].links.right;
+      const roomRight = this.rooms[room].links.right;
       if (roomRight > 0) {
         gates.push(...this.getGates(roomRight, 0));
       }
@@ -351,12 +351,12 @@ PrinceJS.Level.prototype = {
   },
 
   getGatesUp: function (room) {
-    let gates = [];
+    const gates = [];
     if (room && this.rooms[room]) {
-      let roomUp = this.rooms[room].links.up;
+      const roomUp = this.rooms[room].links.up;
       if (roomUp > 0) {
         gates.push(...this.getGates(roomUp, undefined, 2));
-        let roomUpLeft = this.rooms[roomUp].links.left;
+        const roomUpLeft = this.rooms[roomUp].links.left;
         if (roomUpLeft > 0) {
           gates.push(...this.getGates(roomUpLeft, 9, 2));
         }
@@ -366,12 +366,12 @@ PrinceJS.Level.prototype = {
   },
 
   getGatesDown: function (room) {
-    let gates = [];
+    const gates = [];
     if (room && this.rooms[room]) {
-      let roomDown = this.rooms[room].links.down;
+      const roomDown = this.rooms[room].links.down;
       if (roomDown > 0) {
         gates.push(...this.getGates(roomDown, undefined, 0));
-        let roomDownLeft = this.rooms[roomDown].links.left;
+        const roomDownLeft = this.rooms[roomDown].links.left;
         if (roomDownLeft > 0) {
           gates.push(...this.getGates(roomDownLeft, 9, 0));
         }

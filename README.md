@@ -73,6 +73,32 @@ Prince of Persia reimplementation written in HTML5 / JavaScript (MS-DOS version)
   - `npm start`
 - Browser: `localhost:8080`
 
+## Advanced AI System
+
+PrinceJS now features an advanced AI system with multiple enemy behavior types:
+
+### AI Types
+- **Basic**: Original game behavior (default)
+- **Minimax**: Strategic AI using minimax algorithm with alpha-beta pruning
+- **Patrol**: Guards that patrol areas and become alert when detecting players
+- **Aggressive**: Always attacks aggressively
+- **Defensive**: Prioritizes blocking and retreating
+- **Hunter**: Actively seeks player across rooms
+
+### Cheat Menu Controls
+Press **F1** to access the cheat menu and configure AI:
+- Set Enemy AI type for all enemies
+- Toggle Minimax/Patrol AI modes
+- Enable AI debug information
+- Other game cheats (health, time, level skip, etc.)
+
+### Quick Cheats (in-game)
+- **H**: Full health
+- **T**: Reset time to 60 minutes  
+- **N**: Skip to next level
+
+See [AI_SYSTEM.md](AI_SYSTEM.md) for detailed documentation.
+
 ## Options
 
 Url parameters are leveraged to save game state automatically (shortcut in brackets)

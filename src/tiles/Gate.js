@@ -36,8 +36,8 @@ PrinceJS.Tile.Gate.STATE_WAITING = 5;
 PrinceJS.Tile.Gate.prototype = Object.create(PrinceJS.Tile.Base.prototype);
 PrinceJS.Tile.Gate.prototype.constructor = PrinceJS.Tile.Gate;
 
-let syncSoundGatesRaise = new Set();
-let syncSoundGatesDrop = new Set();
+const syncSoundGatesRaise = new Set();
+const syncSoundGatesDrop = new Set();
 
 PrinceJS.Tile.Gate.reset = function () {
   syncSoundGatesRaise.clear();
@@ -45,8 +45,8 @@ PrinceJS.Tile.Gate.reset = function () {
 };
 
 PrinceJS.Tile.Gate.prototype.update = function () {
-  let gateBack = this.tileChildBack;
-  let gateFront = this.tileChildFront;
+  const gateBack = this.tileChildBack;
+  const gateFront = this.tileChildFront;
   let closeSound;
 
   switch (this.state) {
@@ -160,7 +160,7 @@ PrinceJS.Tile.Gate.prototype.drop = function () {
 };
 
 PrinceJS.Tile.Gate.prototype.getBounds = function () {
-  let bounds = new Phaser.Rectangle(0, 0, 0, 0);
+  const bounds = new Phaser.Rectangle(0, 0, 0, 0);
 
   bounds.height = 63 - 10 + this.posY - 4;
   bounds.width = 4;

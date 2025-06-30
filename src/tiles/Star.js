@@ -11,7 +11,7 @@ PrinceJS.Tile.Star = function (game, x, y) {
 };
 
 PrinceJS.Tile.Star.prototype.update = function () {
-  let step = this.game.rnd.between(1, 10);
+  const step = this.game.rnd.between(1, 10);
 
   switch (step) {
     case 1:

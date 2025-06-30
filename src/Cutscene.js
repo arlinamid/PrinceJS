@@ -41,7 +41,7 @@ PrinceJS.Cutscene.prototype = {
   create: function () {
     this.reset();
 
-    let cutscene = this.game.cache.getJSON("cutscene");
+    const cutscene = this.game.cache.getJSON("cutscene");
     if (!cutscene) {
       this.next();
       return;
@@ -73,7 +73,7 @@ PrinceJS.Cutscene.prototype = {
     }
 
     while (this.sceneState === PrinceJS.Cutscene.STATE_SETUP || this.sceneState === PrinceJS.Cutscene.STATE_RUNNING) {
-      let opcode = this.program[this.pc];
+      const opcode = this.program[this.pc];
       let actor;
       switch (opcode.i) {
         case "START":

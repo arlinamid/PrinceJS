@@ -154,7 +154,7 @@ PrinceJS.Tile.Base.prototype = {
   },
 
   getBounds: function () {
-    let bounds = new Phaser.Rectangle(0, 0, 0, 0);
+    const bounds = new Phaser.Rectangle(0, 0, 0, 0);
 
     bounds.height = 63;
     bounds.width = 4;

@@ -7,8 +7,8 @@ PrinceJS.Mouse = function (game, level, room, location, direction) {
   this.charBlockX = location % 10;
   this.charBlockY = Math.floor(location / 10);
 
-  let x = PrinceJS.Utils.convertBlockXtoX(this.charBlockX);
-  let y = PrinceJS.Utils.convertBlockYtoY(this.charBlockY);
+  const x = PrinceJS.Utils.convertBlockXtoX(this.charBlockX);
+  const y = PrinceJS.Utils.convertBlockYtoY(this.charBlockY);
 
   PrinceJS.Actor.call(this, game, x, y, direction, "mouse");
 
@@ -34,8 +34,8 @@ PrinceJS.Mouse.prototype.CMD_FRAME = function (data) {
 };
 
 PrinceJS.Mouse.prototype.updateBlockXY = function () {
-  let footX = this.charX + this.charFdx * this.charFace - this.charFfoot * this.charFace;
-  let footY = this.charY + this.charFdy;
+  const footX = this.charX + this.charFdx * this.charFace - this.charFfoot * this.charFace;
+  const footY = this.charY + this.charFdy;
   this.charBlockX = PrinceJS.Utils.convertXtoBlockX(footX);
   this.charBlockY = Math.min(PrinceJS.Utils.convertYtoBlockY(footY), 2);
 };
@@ -50,7 +50,7 @@ PrinceJS.Mouse.prototype.checkButton = function () {
     return;
   }
 
-  let tile = this.level.getTileAt(this.charBlockX, this.charBlockY, this.room);
+  const tile = this.level.getTileAt(this.charBlockX, this.charBlockY, this.room);
   if (tile) {
     switch (tile.element) {
       case PrinceJS.Level.TILE_RAISE_BUTTON:

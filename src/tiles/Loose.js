@@ -1,6 +1,6 @@
 "use strict";
 
-let Sounds = ["LooseFloorShakes1", "LooseFloorShakes2", "LooseFloorShakes3"];
+const Sounds = ["LooseFloorShakes1", "LooseFloorShakes2", "LooseFloorShakes3"];
 
 PrinceJS.Tile.Loose = function (game, modifier, type) {
   PrinceJS.Tile.Base.call(this, game, PrinceJS.Level.TILE_LOOSE_BOARD, modifier, type);
