@@ -39,6 +39,7 @@ Prince of Persia reimplementation written in HTML5 / JavaScript (MS-DOS version)
 - Touch Controls (tap/drag area on screen, fight mode in brackets):
 
   ![Mobile](assets/web/mobile.svg)
+
   - Dragging can be used to trigger continuous move sequences, e.g.
     - _Run Jump_: Tap Left or Right -> Hold -> Drag in Left or Right corner
     - _Jump Grab_: (Run) Jump -> Hold -> Drag to Center (Shift)
@@ -149,38 +150,6 @@ Converted levels from https://www.popot.org/custom_levels.php:
 - **Level 100:** https://youtu.be/PAHACXdWQ_M
 
 ![Level 100 - Tower of Revenge](assets/web/level100.gif)
-
-## 🚀 Development & Enhancement
-
-### Enhanced Version Roadmap
-
-This project is being upgraded to create an enhanced version of the classic Prince of Persia game:
-
-- **📋 [UPGRADE_ROADMAP.md](UPGRADE_ROADMAP.md)** - Comprehensive upgrade plan and timeline
-- **📁 [STRUCTURE.md](STRUCTURE.md)** - Detailed project structure and architecture
-- **🤖 [ADVANCED_FEATURES_SPEC.md](ADVANCED_FEATURES_SPEC.md)** - AI and multiplayer technical specifications
-- **🎯 Target**: Migrate from Phaser 2.6.2 to Phaser 3.9 with modern JavaScript patterns
-- **🛠️ Tools**: Vite dev server, ES6+ modules, TensorFlow.js, Socket.io
-- **⏱️ Timeline**: 6.5-month development cycle across 5 phases
-
-### Development Status
-
-- **Current Version**: Phaser 2.6.2 with custom game engine
-- **Target Version**: Phaser 3.9 with Vite build system
-- **Development Environment**: Windows 10 with PowerShell 7 ✅ READY
-- **Code Quality**: Modern JavaScript (ES6+), TSDoc comments, modular patterns ✅ CONFIGURED
-- **Phase 1**: Foundation & Setup ✅ **COMPLETE** - Vite dev server, legacy compatibility, all issues resolved
-- **Next Phase**: Phaser 2→3 migration (ready to begin)
-
-### Key Enhancement Goals
-
-1. **Performance**: 60 FPS target with optimized rendering
-2. **Mobile**: Enhanced touch controls and responsive design
-3. **Multiplayer**: Co-op and competitive modes with real-time synchronization
-4. **AI Systems**: Machine learning-based enemies and procedural level generation
-5. **Features**: Save system, achievements, difficulty modes
-6. **Visuals**: HD graphics, particle effects, dynamic lighting
-7. **Audio**: Spatial audio and adaptive music system
 
 ## Credits
 

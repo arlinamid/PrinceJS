@@ -1,8 +1,6 @@
 "use strict";
 
-// Create global PrinceJS namespace
-window.PrinceJS = window.PrinceJS || {};
-const PrinceJS = window.PrinceJS;
+let PrinceJS = {};
 
 PrinceJS.SCALE_FACTOR = 2;
 
@@ -72,11 +70,11 @@ PrinceJS.Boot = function () {
 };
 
 PrinceJS.Boot.prototype = {
-  preload() {
+  preload: function () {
     this.load.bitmapFont("font", "assets/font/prince_0.png", "assets/font/prince.fnt");
   },
 
-  create() {
+  create: function () {
     this.world.scale.set(PrinceJS.SCALE_FACTOR);
     this.state.start("Preloader");
 
